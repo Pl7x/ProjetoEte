@@ -1,0 +1,96 @@
+/* * 1. MUDANÇA PRINCIPAL: TRAVAR A PÁGINA
+     * Força o body a ter exatamente a altura da tela (viewport height)
+     * e esconde qualquer barra de rolagem que o *próprio body* possa ter.
+    */
+    body {
+      height: 100vh;
+      background-color: #f8f9fa; /* Cor de fundo (era .bg-light) */
+    }
+
+    /* * 2. O contêiner principal agora deve ocupar 100% da altura do body
+     * (em vez de min-height, usamos height).
+    */
+    .main-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* 3. Estilos da Sidebar (semelhante ao anterior) */
+    .sidebar {
+      width: 250px;
+      flex-shrink: 0; /* Impede que a sidebar encolha */
+      background-color: #212529;
+      color: #fff;
+      /* * A sidebar em si é um container flex (d-flex flex-column)
+       * para organizar o logo e a lista de menu.
+      */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar .sidebar-logo {
+      padding: 1rem 1.5rem;
+    }
+
+    /* * 4. MUDANÇA NA LISTA DE MENU
+     * A lista de navegação (ul) agora deve crescer para preencher
+     * o espaço vazio e rolar internamente se for muito longa.
+    */
+    .sidebar .nav-pills {
+      flex-grow: 1; /* Faz a lista crescer e ocupar o espaço */
+      overflow-y: auto; /* Adiciona scroll SÓ NESTA LISTA */
+      padding-bottom: 1rem; /* Espaço no final */
+    }
+
+    /* Estilos dos links (sem alteração) */
+    .sidebar .nav-link {
+      color: #adb5bd;
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s ease-in-out;
+    }
+    .sidebar .nav-link:hover {
+      color: #fff;
+      background-color: #495057;
+    }
+    .sidebar .nav-link.active {
+      color: #fff;
+      font-weight: 500;
+      background-color: #0d6efd;
+    }
+
+    /* Estilo do submenu (sem alteração) */
+    .submenu {
+      background-color: #212529;
+      padding-left: 1.5rem;
+    }
+    .submenu .nav-link {
+      padding-left: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .sidebar-heading {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      padding: 0.5rem 1.5rem;
+      margin-top: 1rem;
+      color: #6c757d;
+    }
+
+    /* Rotação do ícone (sem alteração) */
+    .sidebar .nav-link[data-bs-toggle="collapse"]::after {
+      content: '\f282';
+      font-family: 'bootstrap-icons';
+      display: inline-block;
+      margin-left: auto;
+      transition: transform 0.2s ease-in-out;
+    }
+    .sidebar .nav-link[data-bs-toggle="collapse"][aria-expanded="true"]::after {
+      transform: rotate(180deg);
+    }
+
+    /* * 5. MUDANÇA NO CONTEÚDO PRINCIPAL
+     * O conteúdo principal também deve rolar internamente.
+    */
+
+
