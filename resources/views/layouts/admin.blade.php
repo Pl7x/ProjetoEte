@@ -52,7 +52,7 @@
 
     <div class="d-flex flex-column flex-shrink-0 p-3 sidebar">
 
-      <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+      <a href="{{ route('painel') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <i class="bi bi-shield-lock-fill me-2 fs-4"></i>
         <span class="fs-4">Painel Admin</span>
       </a>
@@ -71,11 +71,11 @@
 
 
         <li class="nav-item">
-          <a href="{{route('produtos')}}" class="nav-link {{request()->routeIs('produtos') ? 'active' : ''}}">
-            <i class="bi bi-box-seam-fill me-2"></i>
-            Produtos
+          <a class="nav-link {{ request()->routeIs('produtos*') ? 'active' : '' }}" href="{{ route('produtos') }}">
+              <i class="bi bi-box-seam me-2"></i>
+              Produtos
           </a>
-        </li>
+      </li>
 
 
         <li class="nav-item">
