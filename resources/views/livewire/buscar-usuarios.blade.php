@@ -23,7 +23,11 @@
                         <span class="badge badge-success">Online</span>
                     @else
                         <span class="badge badge-secondary">Offline</span>
-                        <small class="text-muted">Última atividade: {{ $user->last_activity->diffForHumans() }}</small>
+                        @if($user->last_activity)
+                            <small class="text-muted">Última atividade: {{ $user->last_activity->diffForHumans() }}</small>
+                        @else
+                            <small class="text-muted">Nunca acessou</small>
+                        @endif
                     @endif
                 </td>
             </tr>
