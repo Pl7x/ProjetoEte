@@ -10,7 +10,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Cria o usuário Admin
+        User::factory()->create([
+            'name' => 'Pedro Lucas',
+            'email' => 'pedro@gmail.com',
+            'password' => Hash::make('123456'),
+        ]);
 
+        User::factory()->create([
+            'name' => 'Lázaro Anthony',
+            'email' => 'lazaro@gmail.com',
+            'password' => Hash::make('123456'),
+        ]);
 
         // --- ADICIONE ESTA PARTE AQUI ---
         // Chama o seeder que cria as categorias (Proteínas, etc.)
