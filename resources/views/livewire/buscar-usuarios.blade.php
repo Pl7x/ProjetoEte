@@ -6,7 +6,7 @@
             <tr>
                 <th>Nome</th>
                 <th>Email</th>
-                <th>Data de Criação</th>
+                <th>Data de Criaçã</th>
             </tr>
         </thead>
         <tbody>
