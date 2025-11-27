@@ -5,5 +5,9 @@
 
     <hr>
 
+
+@livewire('buscar-usuarios')
+
+
 @endsection
 

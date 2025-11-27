@@ -65,8 +65,6 @@ Route::middleware('auth')->group(function () {
         return view('admin.relatorios');
     })->name('relatorio');
 
-    Route::get('/buscar', function () {
-        return view('BuscarUsuarios');
-    })->name('buscar');
+
 });
 

@@ -22,7 +22,7 @@ class BuscarUsuarios extends Component
             ->orWhere('email', 'like', '%' . $this->search . '%'); // Correção aqui
             $users = $query->orderBy('name', 'asc')->paginate(10);
 
-        return view('livewire.admin.buscar-usuarios', [
+        return view('livewire.buscar-usuarios', [
             'users' => $users,
         ]);
     }
