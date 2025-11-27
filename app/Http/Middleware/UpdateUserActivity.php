@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // Importe a facade Log
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateUserActivity
@@ -17,6 +18,7 @@ class UpdateUserActivity
             $user = Auth::user();
             // Atualiza a data da última atividade
             $user->updateLastActivity();
+            Log::info('Última atividade atualizada para o usuário ' . $user->id); // Adicione o log aqui
         }
 
         return $next($request);

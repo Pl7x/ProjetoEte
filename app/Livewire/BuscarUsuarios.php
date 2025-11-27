@@ -3,23 +3,30 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class BuscarUsuarios extends Component
 {
     use WithPagination;
+    #[Url(as:'search')]
+    public $search = '';
 
-    public $searchTerm = '';
-
+    protected $listeners = ['refresh' => '$refresh'];
+    
     public function render()
     {
-        $users = User::where('name', 'like', '%' . $this->searchTerm . '%')
-            ->orWhere('email', 'like', '%' . $this->searchTerm . '%')
-            ->paginate(10);
+        $query = User::query()
+            ->where('name', 'like', '%' . $this->search . '%')
+            
+            ->orderBy('name', 'asc');
 
+        $users = $query->paginate(10);
+            
         return view('livewire.buscar-usuarios', [
             'users' => $users,
         ]);
     }
+
 }

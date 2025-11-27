@@ -1,7 +1,6 @@
 <div>
     <div class="flex justify-between mb-4">
-        <input type="text" placeholder="Buscar usuários..." wire:model.debounce.500ms="searchTerm" class="input input-bordered w-full mr-4" />
-    </div>
+        <input type="text" wire:model.live.debounce.500ms="search" placeholder="Buscar usuários..." class="form-control mb-3">
 
     <table class="table w-full table-striped">
         <thead>
@@ -20,9 +19,9 @@
                 <td>{{ $user->created_at->format('d/m/Y') }}</td>
                 <td>
                     @if($user->isOnline())
-                        <span class="badge badge-success">Online</span>
+                        <span class="badge text-success">Online</span> {{-- Alterado para text-green-500 --}}
                     @else
-                        <span class="badge badge-secondary">Offline</span>
+                        <span class="badge text-danger">Offline</span>
                         @if($user->last_activity)
                             <small class="text-muted">Última atividade: {{ $user->last_activity->diffForHumans() }}</small>
                         @else
