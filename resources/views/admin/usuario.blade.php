@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', ' - Produtos ')
+@section('title', ' - Usuarios ')
 @section('conteudo')
     <h2>Usuários </h2>
 

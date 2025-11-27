@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductController;
+use App\Livewire\Edit;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
@@ -50,8 +51,11 @@ Route::middleware('auth')->group(function () {
     // 2. Salvar novo produto (POST)
     Route::post('/produtos', [ProductController::class, 'store'])->name('produtos.store');
 
-    // 3. Listar produtos (GET)
+
     Route::get('/produtos', [ProductController::class, 'index'])->name('produtos');
+
+
+
 
     Route::get('/usuarios', function () {
         return view('admin.usuario');

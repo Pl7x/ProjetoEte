@@ -1,6 +1,7 @@
 @extends('layouts.admin')
-@section('title', ' - Produtos ')
+@section('title', ' - Editar ')
 @section('conteudo')
 
-    @livewire('lista')
+@livewire('edit')
+
 @endsection
