@@ -87,7 +87,7 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="#" class="btn btn-sm btn-outline-primary d-flex align-items-center"> {{-- Rota corrigida para editar produto --}}
+                                    <a href="{{ route('produtos.edit', ['product' => $produto->id]) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center"> {{-- Rota corrigida para editar produto --}}
                                         <i class="fas fa-edit me-2"></i> Editar
                                     </a>
                                     

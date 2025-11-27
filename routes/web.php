@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ProductController;
 use App\Livewire\Edit;
+use App\Models\Product;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
@@ -54,7 +55,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/produtos', [ProductController::class, 'index'])->name('produtos');
 
-
+Route::get('/produtos/{product}/editar', function (Product $product) {
+        return view('admin.produtos.edit', ['product' => $product]);
+    })->name('produtos.edit');
 
 
     Route::get('/usuarios', function () {
