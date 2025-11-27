@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'last_activity', // Adicionado last_activity ao fillable
     ];
 
     /**
@@ -43,6 +44,19 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_activity' => 'datetime', // Adicionado o cast para datetime
         ];
+    }
+
+    // Método para verificar se o usuário está online
+    public function isOnline()
+    {
+        return $this->last_activity && $this->last_activity->diffInMinutes(now()) < 5; // Ajuste o tempo conforme necessário
+    }
+
+    // Método para atualizar a última atividade do usuário
+    public function updateLastActivity()
+    {
+        $this->update(['last_activity' => now()]);
     }
 }
