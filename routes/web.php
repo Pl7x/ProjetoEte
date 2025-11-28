@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\ProductImageController;
 use App\Livewire\Edit;
 use App\Models\Product;
 use Illuminate\Container\Attributes\Auth;
@@ -16,9 +17,7 @@ Route::get('/admin', function () {
 })->name('login');
 
 
-Route::get('/registrar', function () {
-    return view('registrar');
-})->name('registrar');
+
 
 Route::get('/sobre', function () {
     return view('sobre');
@@ -71,6 +70,8 @@ Route::get('/produtos/{product}/editar', function (Product $product) {
     Route::get('/relatorio', function () {
         return view('admin.relatorios');
     })->name('relatorio');
+
+
 
 
 });

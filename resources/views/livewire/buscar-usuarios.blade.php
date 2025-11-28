@@ -2,13 +2,17 @@
     <div class="flex justify-between mb-4">
         <input type="text" wire:model.live.debounce.500ms="search" placeholder="Buscar usuários..." class="form-control mb-3">
 
+        <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-success">Novo Cadastro</button>
+    </div>
+
     <table class="table w-full table-striped">
         <thead>
             <tr>
                 <th>Nome</th>
                 <th>Email</th>
-                <th>Data de Criação</th>
                 <th>Status</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -16,7 +20,7 @@
             <tr>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
-                <td>{{ $user->created_at->format('d/m/Y') }}</td>
+
                 <td>
                     @if($user->isOnline())
                         <span class="badge text-success">Online</span> {{-- Alterado para text-green-500 --}}
@@ -29,6 +33,10 @@
                         @endif
                     @endif
                 </td>
+                <td>
+                        <button class="btn btn-primary"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                    </td>
             </tr>
             @endforeach
         </tbody>
