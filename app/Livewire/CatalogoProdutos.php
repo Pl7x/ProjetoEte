@@ -12,28 +12,26 @@ class CatalogoProdutos extends Component
 {
     use WithPagination;
 
+    // Filtros existentes
     public $search = '';
-    // Define 'relevancia' como o padrão inicial
-    public $sort = 'relevancia';
+    public $sort = 'relevancia'; // Define 'relevancia' como o padrão inicial
     public $categoryFilter = null;
-
-    // NOVAS PROPRIEDADES PARA O PREÇO
     public $minPrice = null;
     public $maxPrice = null;
-
     // public $selectedBrands = []; // Se for usar marcas
+
+    // NOVO: Propriedade para armazenar o ID do produto selecionado para a modal
+    public $selectedProductId = null;
 
     // Resetar paginação ao filtrar
     public function updatingSearch() { $this->resetPage(); }
     public function updatingCategoryFilter() { $this->resetPage(); }
     public function updatingSort() { $this->resetPage(); }
-
-    // NOVOS MÉTODOS DE ATUALIZAÇÃO DE PREÇO
     public function updatingMinPrice() { $this->resetPage(); }
     public function updatingMaxPrice() { $this->resetPage(); }
     // public function updatingSelectedBrands() { $this->resetPage(); }
 
-    // Método para limpar filtros (CORRIGIDO)
+    // Método para limpar filtros
     public function resetFilters()
     {
         // O método reset() volta as propriedades para seus valores padrão definidos no início da classe.
@@ -45,6 +43,20 @@ class CatalogoProdutos extends Component
 
         $this->resetPage();
     }
+
+    // NOVO: Método chamado ao clicar no botão "Comprar"
+    public function openQuickView($productId)
+    {
+        // 1. Define o ID do produto selecionado. Isso fará com que o componente
+        //    'product-quick-view' seja renderizado na view.
+        $this->selectedProductId = $productId;
+
+        // 2. Dispara um evento para o navegador (JS) abrir a modal do Bootstrap.
+        $this->dispatch('show-quick-view-modal');
+    }
+
+    // Opcional: Método para resetar o ID quando a modal fechar
+    // public function closeQuickView() { $this->selectedProductId = null; }
 
     public function render()
     {
@@ -63,12 +75,11 @@ class CatalogoProdutos extends Component
             $query->where('category_id', $this->categoryFilter);
         }
 
-        // 3. NOVO: Filtro de Faixa de Preço
+        // 3. Filtro de Faixa de Preço
         if ($this->minPrice) {
             // Garante que é um número e filtra maior ou igual
             $query->where('price', '>=', (float) $this->minPrice);
         }
-
         if ($this->maxPrice) {
              // Garante que é um número e filtra menor ou igual
             $query->where('price', '<=', (float) $this->maxPrice);
@@ -87,7 +98,6 @@ class CatalogoProdutos extends Component
 
 
         $products = $query->paginate(12);
-
         $categories = Category::all();
         // $brands = Brand::all(); // Se houver
 

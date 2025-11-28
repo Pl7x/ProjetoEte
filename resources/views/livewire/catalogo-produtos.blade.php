@@ -1,20 +1,6 @@
 <div class="container py-5">
 
-    {{-- Toast de Notificação (Mantido) --}}
-    <div x-data="{ show: false, message: '' }"
-         x-on:produto-adicionado.window="show = true; message = $event.detail.message; setTimeout(() => show = false, 3000)"
-         class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div x-show="show" x-transition class="toast show align-items-center text-white bg-success border-0" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-check-circle-fill me-2"></i> <span x-text="message"></span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" @click="show = false"></button>
-            </div>
-        </div>
-    </div>
-
-    {{-- Header (Mantido) --}}
+    {{-- Header --}}
     <div class="text-center mb-5">
         <h1 class="fw-bold display-5">Catálogo de Produtos</h1>
         <p class="text-muted lead">Encontre o suplemento ideal para o seu treino.</p>
@@ -26,14 +12,14 @@
         <div class="col-lg-3">
             <div class="sticky-top" style="top: 100px;">
 
-                {{-- Botão Mobile (Mantido) --}}
+                {{-- Botão Mobile --}}
                 <button class="btn btn-outline-dark w-100 d-lg-none mb-4" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
                     <i class="bi bi-funnel me-2"></i> Filtros
                 </button>
 
                 <div class="collapse d-lg-block" id="filtersCollapse">
 
-                    {{-- Filtro: Busca (Mantido) --}}
+                    {{-- Filtro: Busca --}}
                     <div class="mb-4 position-relative">
                         <input type="text"
                                wire:model.live.debounce.300ms="search"
@@ -44,7 +30,7 @@
                         </span>
                     </div>
 
-                    {{-- Filtro: Categorias (Mantido) --}}
+                    {{-- Filtro: Categorias --}}
                     <div class="mb-4">
                         <h6 class="fw-bold text-uppercase small text-dark mb-3">Categorias</h6>
                         <div class="list-group list-group-flush small">
@@ -63,11 +49,10 @@
 
                     <hr class="opacity-10 my-4">
 
-                    {{-- Filtro: Preço (Já estava correto com wire:model) --}}
+                    {{-- Filtro: Preço --}}
                     <div class="mb-4">
                         <h6 class="fw-bold text-uppercase small text-dark mb-3">Preço</h6>
                         <div class="d-flex gap-2">
-                            {{-- Adicionei min="0" step="0.01" para melhor UX --}}
                             <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="minPrice" class="form-control form-control-sm" placeholder="Min">
                             <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="maxPrice" class="form-control form-control-sm" placeholder="Max">
                         </div>
@@ -75,27 +60,13 @@
 
                     <hr class="opacity-10 my-4">
 
-                    {{-- Filtro: Marcas (Mantido) --}}
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-uppercase small text-dark mb-3">Marcas</h6>
-                        @if(isset($todasMarcas))
-                            @foreach($todasMarcas as $brand)
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" wire:model.live="selectedBrands" value="{{ $brand->id }}" id="brand-{{ $loop->index }}">
-                                    <label class="form-check-label small text-muted" for="brand-{{ $loop->index }}">{{ $brand->name }}</label>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
-
-                    {{-- Loading Indicator (Mantido) --}}
+                    {{-- Loading Indicator --}}
                     <div wire:loading class="text-center w-100 py-2">
                         <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
                         <small class="text-muted ms-2">Atualizando...</small>
                     </div>
 
-                    {{-- Botão Limpar Filtros (CORRIGIDO) --}}
-                    {{-- Agora chama o método do componente em vez de fazer tudo inline --}}
+                    {{-- Botão Limpar Filtros --}}
                     <button wire:click="resetFilters" class="btn btn-sm btn-outline-secondary w-100 mt-3">
                         Limpar Filtros
                     </button>
@@ -106,7 +77,7 @@
         {{-- Grid de Produtos --}}
         <div class="col-lg-9">
 
-            {{-- Toolbar Superior (Mantido) --}}
+            {{-- Toolbar Superior --}}
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 pb-3 border-bottom">
                 <p class="text-muted small mb-2 mb-md-0">
                     Mostrando <strong>{{ count($products) }}</strong> produtos
@@ -121,11 +92,11 @@
                 </div>
             </div>
 
-            {{-- Lista de Cards (Mantido) --}}
+            {{-- Lista de Cards --}}
             <div class="row g-4">
                 @forelse($products as $produto)
                     <div class="col-md-6 col-xl-4">
-                        <div class="card h-100 border-0 shadow-sm hover-lift overflow-hidden group">
+                        <div class="card h-100 border-0 shadow-sm hover-lift overflow-hidden group" wire:key="product-{{ $produto->id }}">
                             <div class="position-relative bg-light p-4 mb-3 rounded-3 d-flex align-items-center justify-content-center" style="height: 250px;">
                                 @if ($produto->image_path)
                                     <img src="{{ asset('storage/' . $produto->image_path) }}"
@@ -136,9 +107,13 @@
                                     <img src="https://via.placeholder.com/300x300?text=Sem+Imagem" class="img-fluid transition-transform group-hover-scale" style="mix-blend-mode: multiply; max-height: 180px;" alt="Imagem não disponível">
                                 @endif
 
-                                {{-- Botão Comprar (Exemplo) --}}
-                                <button class="btn btn-dark w-75 position-absolute bottom-0 mb-3 rounded-pill shadow fw-bold opacity-0 group-hover-visible translate-y-100 group-hover-translate-0 transition-all">
-                                    <span>Comprar</span>
+                                {{-- Botão Comprar (ALTERADO PARA ABRIR A MODAL) --}}
+                                <button wire:click.prevent="openQuickView({{ $produto->id }})"
+                                        class="btn btn-dark w-75 position-absolute bottom-0 mb-3 rounded-pill shadow fw-bold opacity-0 group-hover-visible translate-y-100 group-hover-translate-0 transition-all">
+                                    <span wire:loading.remove wire:target="openQuickView({{ $produto->id }})">Comprar</span>
+                                    <span wire:loading wire:target="openQuickView({{ $produto->id }})">
+                                        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span> Carregando...
+                                    </span>
                                 </button>
                             </div>
 
@@ -159,7 +134,6 @@
                         </div>
                         <h4 class="text-muted">Nenhum produto encontrado.</h4>
                         <p class="text-muted small">Tente ajustar os filtros ou buscar por outro termo.</p>
-                        {{-- Botão Limpar Filtros (CORRIGIDO TAMBÉM AQUI) --}}
                         <button wire:click="resetFilters" class="btn btn-warning fw-bold mt-2">Limpar Filtros</button>
                     </div>
                 @endforelse
@@ -170,6 +144,19 @@
             </div>
         </div>
     </div>
+
+    {{-- --- MODAL QUICK VIEW (ADICIONADA AQUI) --- --}}
+    <div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                @if($selectedProductId)
+    @livewire('product-quick-view', ['productId' => $selectedProductId], key('quick-view-' . $selectedProductId))
+        @else
+    @endif
+            </div>
+        </div>
+    </div>
+    {{-- ------------------------------------------- --}}
 
     {{-- Estilos Inline (Mantidos) --}}
     <style>
@@ -184,4 +171,23 @@
         .transition-transform { transition: transform 0.4s ease; }
         .translate-y-100 { transform: translateY(100%); }
     </style>
+
+    {{-- Script para abrir a modal (Adicionado aqui) --}}
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            const modalElement = document.getElementById('quickViewModal');
+            const modalInstance = new bootstrap.Modal(modalElement);
+
+            // Ouve o evento disparado pelo componente do catálogo para abrir a modal
+            Livewire.on('show-quick-view-modal', () => {
+                modalInstance.show();
+            });
+
+            // Opcional: Limpa o ID do produto selecionado quando a modal fecha
+            modalElement.addEventListener('hidden.bs.modal', () => {
+                // Chama um método no componente Livewire para resetar o ID (se necessário)
+                // @this.call('closeQuickView');
+            });
+        });
+    </script>
 </div>
