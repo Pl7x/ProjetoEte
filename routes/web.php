@@ -63,6 +63,10 @@ Route::get('/produtos/{product}/editar', function (Product $product) {
         return view('admin.usuario');
     })->name('usuarios');
 
+        Route::get('/usuarios/novo', function () {
+        return view('admin.criar-usuario');
+    })->name('usuarios.novo');
+
     Route::get('/pedidos', function () {
         return view('admin.pedidos');
     })->name('pedidos');

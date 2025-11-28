@@ -3,7 +3,7 @@
         <input type="text" wire:model.live.debounce.500ms="search" placeholder="Buscar usuários..." class="form-control mb-3">
 
         <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-success">Novo Cadastro</button>
+       <a class="btn btn-success" href="{{route("usuarios.novo")}}">Novo Cadastro</a>
     </div>
 
     <table class="table w-full table-striped">
