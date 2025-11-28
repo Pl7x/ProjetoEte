@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', ' - Performance Redefinida')
+@section('title', ' - home')
 
 @section('conteudo')
 
@@ -8,7 +8,7 @@
         {{-- Background Mais Dinâmico --}}
         <div class="position-absolute top-0 start-0 w-100 h-100"
              style="background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1517963879433-6ad2b056d712?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-                    background-size: cover; background-position: center top; background-attachment: fixed;">
+                     background-size: cover; background-position: center top; background-attachment: fixed;">
         </div>
 
         <div class="container position-relative z-2 pt-5">
@@ -55,7 +55,7 @@
              <div class="row g-4 justify-content-center">
                 @foreach([
                     ['icon' => 'box-seam', 'title' => 'Entrega Rápida', 'desc' => 'Envio prioritário para todo Brasil.'],
-                    ['icon' => 'shield-check-fill', 'title' => 'Pureza Garantida', 'desc' => 'Matéria-prima importada e laudos.'],
+                    ['icon' => 'bi bi-shield-check', 'title' => 'Pureza Garantida', 'desc' => 'Matéria-prima importada e laudos.'],
                     ['icon' => 'award-fill', 'title' => 'Formulações Elite', 'desc' => 'Doses efetivas baseadas em ciência.'],
                     ['icon' => 'whatsapp', 'title' => 'Consultoria Grátis', 'desc' => 'Tire dúvidas antes de comprar.']
                 ] as $item)
@@ -119,18 +119,32 @@
                     
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2">
-                    <div class="position-relative">
-                         {{-- Elemento decorativo de fundo --}}
-                        <div class="position-absolute top-50 start-50 translate-middle bg-warning opacity-10 rounded-circle" style="width: 120%; padding-bottom: 120%; z-index: -1;"></div>
-                        <img src="https://images.unsplash.com/photo-1626934998159-e6767141d044?auto=format&fit=crop&w=800&q=80" alt="Pesquisa e Desenvolvimento" class="img-fluid rounded-4 shadow-lg hover-scale-img transition-transform">
-                        {{-- Card Flutuante sobre a imagem --}}
-                        <div class="position-absolute bottom-0 start-0 bg-white p-3 rounded-3 shadow-sm m-4 d-flex align-items-center gap-3 animate-bounce-slow">
+                    {{-- Container principal, agora com flex-column para empilhar os elementos --}}
+                    <div class="position-relative d-flex flex-column align-items-center">
+
+                        {{-- Elemento decorativo de fundo --}}
+                        <div class="position-absolute top-50 start-50 translate-middle bg-warning opacity-10 rounded-circle"
+                             style="width: 80%; padding-bottom: 80%; z-index: -1;"></div>
+
+                        {{-- A imagem principal --}}
+                        {{-- Adicionamos 'mb-4' para dar espaço entre a imagem e o card --}}
+                        <img src="{{ asset('img/laudo.jpg') }}"
+                             alt="Pesquisa e Desenvolvimento"
+                             class="img-fluid rounded-4 shadow-lg hover-scale-img transition-transform mb-4"
+                             style="max-width: 60%;">
+
+                        {{-- Card Flutuante --}}
+                        {{-- Removemos 'position-absolute', 'bottom-0', 'start-0', 'm-4' --}}
+                        {{-- Adicionamos 'position-relative' para o efeito de bounce e ajustamos a margem --}}
+                        <div class="bg-white p-3 rounded-3 shadow-sm d-flex align-items-center gap-3 animate-bounce-slow position-relative"
+                             style="z-index: 1; margin-top: 0rem;"> {{-- Margem negativa para sobrepor levemente a imagem --}}
                             <i class="bi bi-shield-fill-check text-primary fs-2"></i>
                             <div>
                                 <h6 class="fw-bold mb-0">Laudos Aprovados</h6>
                                 <small class="text-success fw-bold">100% de pureza verificada</small>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -189,6 +203,7 @@
 
 @push('styles')
 <style>
+
     /* --- NOVOS ESTILOS --- */
     /* Ajuste para o Hero ficar atrás dos cards de benefícios */
     .hero-section { z-index: 1; }

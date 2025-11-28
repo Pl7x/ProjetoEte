@@ -20,6 +20,8 @@
 
     <!-- Estilos Globais -->
     <style>
+
+
         :root {
             --bs-font-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
             --primary-color: #ffc107;
@@ -89,7 +91,7 @@
                             <li><a class="dropdown-item fw-bold" href="{{ route('catalogo') }}">Ver Tudo</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="#">Kits</a></li>
+                    
                     <li class="nav-item"><a class="nav-link" href="{{ route('sobre') }}">Blog</a></li>
                 </ul>
 
