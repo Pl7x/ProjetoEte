@@ -107,7 +107,7 @@
         </li>
 
         <li class="nav-item">
-            <a href="{{route('usuarios')}}" class="nav-link {{request()->routeIs('usuarios') ? 'active' : ''}}">
+            <a href="{{route('usuarios')}}" class="nav-link {{request()->routeIs('usuarios*') ? 'active' : ''}}">
             <i class="bi bi-people-fill me-2"></i>
             Usuários
           </a>

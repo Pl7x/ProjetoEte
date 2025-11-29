@@ -51,8 +51,7 @@ class UserForm extends Component
     // ...
 public function save()
 {
-    dd('Chegou no Save', $this->name, $this->email, $this->password);
-
+    
     $this->validate(); // Se falhar aqui, ele para e mostra erros na view
 
     $data = [
@@ -76,7 +75,8 @@ public function save()
 }
 
     public function render()
-    {
-        return view('livewire.user-form');
-    }
+{
+    // O nome aqui deve ser igual ao nome do arquivo na pasta views/livewire
+    return view('livewire.userform'); 
+}
 }
