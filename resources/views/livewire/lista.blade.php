@@ -1,14 +1,43 @@
-<div class="container-fluid px-0"> {{-- ESTA É A ÚNICA DIV PAI REQUERIDA PELO LIVEWIRE --}}
+<div class="container-fluid px-0">
 
     {{-- Cabeçalho com botão Novo --}}
     <div class="d-flex justify-content-between align-items-center my-4">
         <h4 class="mb-0">Gerenciar Lista</h4>
-        <a href="{{ route('produtos.create') }}" class="btn btn-primary"> {{-- Rota corrigida para criar produto --}}
+        <a href="{{ route('produtos.create') }}" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i> Novo Produto
         </a>
     </div>
 
-    {{-- Mensagens de Sucesso/Erro (Flash Messages) --}}
+    {{-- BARRA DE FILTROS (NOVO) --}}
+    <div class="card mb-4 border-0 shadow-sm bg-light">
+        <div class="card-body py-3">
+            <div class="row g-3">
+                {{-- Pesquisa por Nome --}}
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar por nome do produto..." 
+                            wire:model.live.debounce.300ms="search"> {{-- debounce evita muitas requisições enquanto digita --}}
+                    </div>
+                </div>
+
+                {{-- Filtro por Categoria --}}
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-filter"></i></span>
+                        <select class="form-select border-start-0 ps-0" wire:model.live="category_id">
+                            <option value="">Todas as Categorias</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Mensagens de Sucesso/Erro --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
@@ -24,9 +53,17 @@
 
     {{-- Cartão da Tabela --}}
     <div class="card mb-4 shadow-sm border-0">
-        <div class="card-header bg-white fw-bold py-3">
-            <i class="fas fa-list me-1 text-primary"></i>
-            Lista Completa de Itens
+        <div class="card-header bg-white fw-bold py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-list me-1 text-primary"></i>
+                Lista de Itens
+            </div>
+            {{-- Mostra contador de resultados se estiver filtrando --}}
+            @if($search || $category_id)
+                <small class="text-muted fw-normal">
+                    Encontrados: {{ $produtos->total() }} produtos
+                </small>
+            @endif
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -72,31 +109,22 @@
                             </td>
                             <td class="text-center">
                                 @if($produto->stock_quantity <= 0)
-                                    <span class="badge bg-danger bg-opacity-10 text-danger fw-normal px-3 py-2 rounded-pill">
-                                        Esgotado
-                                    </span>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger fw-normal px-3 py-2 rounded-pill">Esgotado</span>
                                 @elseif($produto->stock_quantity <= 10)
-                                    <span class="badge bg-warning bg-opacity-10 text-warning fw-bold px-3 py-2 rounded-pill">
-                                        {{ $produto->stock_quantity }} unid. (Baixo)
-                                    </span>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning fw-bold px-3 py-2 rounded-pill">{{ $produto->stock_quantity }} unid. (Baixo)</span>
                                 @else
-                                    <span class="badge bg-success bg-opacity-10 text-success fw-normal px-3 py-2 rounded-pill">
-                                        {{ $produto->stock_quantity }} unidades
-                                    </span>
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-normal px-3 py-2 rounded-pill">{{ $produto->stock_quantity }} unidades</span>
                                 @endif
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('produtos.edit', ['product' => $produto->id]) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center"> {{-- Rota corrigida para editar produto --}}
+                                    <a href="{{ route('produtos.edit', ['product' => $produto->id]) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center">
                                         <i class="fas fa-edit me-2"></i> Editar
                                     </a>
-                                    
-                                    {{-- Botão Excluir que chama o modal de confirmação do Livewire --}}
                                     <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center"
-                                        wire:click="confirmDelete({{ $produto->id }})" {{-- Chama o método confirmDelete no componente Livewire --}}
-                                        wire:loading.attr="disabled" {{-- Desabilita o botão enquanto o Livewire processa --}}
-                                        wire:target="confirmDelete({{ $produto->id }})" {{-- Exibe loading visual para este botão específico --}}
-                                    >
+                                        wire:click="confirmDelete({{ $produto->id }})"
+                                        wire:loading.attr="disabled"
+                                        wire:target="confirmDelete({{ $produto->id }})">
                                         <i class="fas fa-trash-alt me-2"></i> Excluir
                                     </button>
                                 </div>
@@ -106,12 +134,20 @@
                         <tr>
                             <td colspan="6" class="text-center py-5 text-muted">
                                 <div class="d-flex flex-column align-items-center">
-                                    <i class="fas fa-box-open fa-3x mb-3 text-secondary opacity-25"></i>
+                                    <i class="fas fa-search fa-3x mb-3 text-secondary opacity-25"></i>
                                     <p class="mb-1 fs-5 fw-bold">Nenhum produto encontrado.</p>
-                                    <p class="small mb-3">O banco de dados está vazio.</p>
-                                    <a href="{{ route('produtos.create') }}" class="btn btn-sm btn-primary"> {{-- Rota corrigida para criar produto --}}
-                                        <i class="fas fa-plus me-1"></i> Cadastrar o primeiro produto
-                                    </a>
+                                    <p class="small mb-3">
+                                        @if($search || $category_id)
+                                            Tente ajustar os filtros de busca.
+                                        @else
+                                            O banco de dados está vazio.
+                                        @endif
+                                    </p>
+                                    @if(!$search && !$category_id)
+                                        <a href="{{ route('produtos.create') }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-plus me-1"></i> Cadastrar o primeiro produto
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -127,56 +163,49 @@
         @endif
     </div>
 
-
-{{-- Modal de Confirmação de Exclusão (usando Bootstrap Modal) --}}
-{{-- wire:ignore.self impede que o Livewire re-renderize o conteúdo do modal,
-     permitindo que o Bootstrap o controle sem interferência. --}}
-<div wire:ignore.self class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteProductModalLabel">Confirmar Exclusão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                {{-- Exibe o nome do produto se estiver disponível, caso contrário, uma mensagem genérica --}}
-                @if ($productToDeleteName)
-                    <p>Tem certeza que deseja excluir o produto **{{ $productToDeleteName }}**?</p>
-                @else
-                    <p>Tem certeza que deseja excluir este produto?</p>
-                @endif
-                <p class="text-danger small">Esta ação não pode ser desfeita.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" wire:click="deleteProduct" wire:loading.attr="disabled">
-                    {{-- Spinner de carregamento para feedback visual durante a exclusão --}}
-                    <span wire:loading wire:target="deleteProduct" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Confirmar Exclusão
-                </button>
+    {{-- Modal de Exclusão (Mantido igual) --}}
+    <div wire:ignore.self class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteProductModalLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if ($productToDeleteName)
+                        <p>Tem certeza que deseja excluir o produto <strong>{{ $productToDeleteName }}</strong>?</p>
+                    @else
+                        <p>Tem certeza que deseja excluir este produto?</p>
+                    @endif
+                    <p class="text-danger small mb-0">Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" wire:click="deleteProduct" wire:loading.attr="disabled">
+                        <span wire:loading wire:target="deleteProduct" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Confirmar Exclusão
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-{{-- Bloco para adicionar scripts personalizados ao layout principal (deve ter um @stack('scripts') na sua master blade) --}}
-@push('scripts')
-<script>
-    document.addEventListener('livewire:initialized', () => { // Usar livewire:initialized para garantir que o Livewire esteja pronto
-        // Escuta o evento 'show-delete-modal' emitido pelo componente Livewire para abrir o modal
-        Livewire.on('show-delete-modal', () => {
-            var myModal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
-            myModal.show();
-        });
+    @push('scripts')
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('show-delete-modal', () => {
+                var myModal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
+                myModal.show();
+            });
 
-        // Escuta o evento 'hide-delete-modal' emitido pelo componente Livewire para fechar o modal
-        Livewire.on('hide-delete-modal', () => {
-            var myModal = bootstrap.Modal.getInstance(document.getElementById('deleteProductModal'));
-            if (myModal) {
-                myModal.hide();
-            }
+            Livewire.on('hide-delete-modal', () => {
+                var el = document.getElementById('deleteProductModal');
+                var myModal = bootstrap.Modal.getInstance(el);
+                if (myModal) {
+                    myModal.hide();
+                }
+            });
         });
-    });
-</script>
-@endpush
+    </script>
+    @endpush
 </div>

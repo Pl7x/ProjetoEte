@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\ProductImageController;
-use App\Http\Controllers\Usercontroller;
-use App\Livewire\Edit;
-use App\Models\Product;
-use Illuminate\Container\Attributes\Auth;
+use App\Http\Controllers\Admin\Usercontroller; // Importação corrigida para Admin
+use App\Http\Controllers\CatalogoController; // Importação do Catálogo
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Rotas Públicas
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('home');
@@ -16,9 +19,6 @@ Route::get('/', function () {
 Route::get('/admin', function () {
     return view('login');
 })->name('login');
-
-
-
 
 Route::get('/sobre', function () {
     return view('sobre');
@@ -37,7 +37,13 @@ Route::get('/politicas', function () {
 })->name('politicas');
 
 
+/*
+|--------------------------------------------------------------------------
+| Rotas Protegidas (Painel Admin)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
+
     Route::get('/painel', function () {
         return view('admin.dashboard');
     })->name('painel');
@@ -47,26 +53,31 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('login');
     })->name('logout');
 
-    Route::get('/produtos/criar', [ProductController::class, 'create'])->name('produtos.create');
-
-    // 2. Salvar novo produto (POST)
-    Route::post('/produtos', [ProductController::class, 'store'])->name('produtos.store');
-
-
+    // --- Rotas de Produtos ---
+    
+    // 1. Listagem
     Route::get('/produtos', [ProductController::class, 'index'])->name('produtos');
 
-Route::get('/produtos/{product}/editar', function (Product $product) {
-        return view('admin.produtos.edit', ['product' => $product]);
-    })->name('produtos.edit');
+    // 2. Criar (Formulário e Ação)
+    Route::get('/produtos/criar', [ProductController::class, 'create'])->name('produtos.create');
+    Route::post('/produtos', [ProductController::class, 'store'])->name('produtos.store');
+
+    // 3. Editar (Formulário e Ação)
+    // Importante: Aponta para o método 'edit' do Controller, que reutiliza a view 'create'
+    Route::get('/produtos/{product}/editar', [ProductController::class, 'edit'])->name('produtos.edit');
+    Route::put('/produtos/{product}', [ProductController::class, 'update'])->name('produtos.update');
+
+    // 4. Apagar
+    Route::delete('/produtos/{product}', [ProductController::class, 'destroy'])->name('produtos.destroy');
 
 
-    Route::get('/usuarios', function () {
-        return view('admin.usuario');
-    })->name('usuarios');
+    // --- Rotas de Usuários ---
+    
+    Route::get('/usuarios', [Usercontroller::class, 'index'])->name('usuarios');
+    Route::get('/usuarios/novo', [Usercontroller::class, 'create'])->name('usuarios.novo');
 
-    Route::get('/usuarios/novo', function () {
-        return view('admin.criar-usuario');
-    })->name('usuarios.novo');
+
+    // --- Outras Rotas do Admin ---
 
     Route::get('/pedidos', function () {
         return view('admin.pedidos');
@@ -76,8 +87,4 @@ Route::get('/produtos/{product}/editar', function (Product $product) {
         return view('admin.relatorios');
     })->name('relatorio');
 
-
-
-
 });
-

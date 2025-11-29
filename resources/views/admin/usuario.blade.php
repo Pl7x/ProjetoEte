@@ -6,7 +6,7 @@
     <hr>
 
 
-@livewire('buscar-usuarios')
+<livewire:lista-usuarios />
 
 
 @endsection

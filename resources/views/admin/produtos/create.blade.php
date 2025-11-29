@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', ' - Cadastrar ')
+@section('title')
 @section('conteudo')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -12,6 +12,5 @@
     </div>
 
 
-@livewire('create')
-
+<livewire:create :product="$produto ?? null" />
 @endsection
