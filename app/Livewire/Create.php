@@ -3,34 +3,32 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Product; // Importe o modelo Product
-use App\Models\Category; // <--- NOVO: Importe o modelo Category
+use App\Models\Product;
+use App\Models\Category;
 use Illuminate\View\View;
-use Livewire\WithFileUploads; // Se você estiver fazendo upload de imagens
+use Livewire\WithFileUploads;
+use Illuminate\Support\Str; // <--- 1. IMPORTANTE: Importar a classe Str
 
 class Create extends Component
 {
-    use WithFileUploads; // Habilita o upload de arquivos no Livewire
+    use WithFileUploads;
 
-    // Propriedades para os campos do formulário
     public $name;
     public $description;
     public $price;
     public $stock_quantity;
     public $category_id;
-    public $image; // Para o upload da imagem
+    public $image;
 
-    // Regras de validação
     protected $rules = [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string|max:1000',
         'price' => 'required|numeric|min:0',
         'stock_quantity' => 'required|integer|min:0',
-        'category_id' => 'required|exists:categories,id', // Verifica se a categoria existe
-        'image' => 'nullable|image|max:1024', // 1MB Max
+        'category_id' => 'required|exists:categories,id',
+        'image' => 'nullable|image|max:1024',
     ];
 
-    // Mensagens de validação personalizadas (opcional)
     protected $messages = [
         'name.required' => 'O nome do produto é obrigatório.',
         'price.required' => 'O preço é obrigatório.',
@@ -45,41 +43,46 @@ class Create extends Component
         'image.max' => 'A imagem não pode ser maior que 1MB.',
     ];
 
-
-    // Método para salvar o novo produto
     public function saveProduct()
     {
-        $this->validate(); // Roda a validação
+        $this->validate();
 
         $imagePath = null;
         if ($this->image) {
-            // Armazena a imagem no disco 'public' (configurado em config/filesystems.php)
             $imagePath = $this->image->store('products', 'public');
         }
 
+        // <--- 2. CORREÇÃO: Gerar o Slug aqui
+        $slug = Str::slug($this->name);
+
+        // Se quiser garantir que o slug seja único (caso já exista outro produto com mesmo nome)
+        // pode-se adicionar um contador, mas para começar o básico funciona.
+
         Product::create([
             'name' => $this->name,
+            'slug' => $slug, // <--- Adicionado o campo slug
             'description' => $this->description,
             'price' => $this->price,
             'stock_quantity' => $this->stock_quantity,
             'category_id' => $this->category_id,
-            'image_path' => $imagePath, // Salva o caminho da imagem
+            'image_path' => $imagePath,
+            'is_active' => true, // Opcional: define como ativo por padrão ao criar
+            'is_featured' => false,
         ]);
 
-        session()->flash('success', 'Produto criado com sucesso!'); // Mensagem flash
-        $this->reset(); // Limpa os campos do formulário após o envio
-        return redirect()->route('admin.produtos.index'); // Redireciona para a lista de produtos
+        session()->flash('success', 'Produto criado com sucesso!');
+        $this->reset();
+        
+        // Verifique se o nome da sua rota é 'produtos' ou 'admin.produtos.index' no web.php
+        return redirect()->route('produtos'); 
     }
-
 
     public function render(): View
     {
-        // <--- NOVO: Busque as categorias aqui
-        $categorias = Category::orderBy('name')->get(); // Busca todas as categorias ordenadas por nome
+        $categorias = Category::orderBy('name')->get();
 
-        // Passe a variável $categorias para a view
         return view('livewire.create', [
-            'categorias' => $categorias, // <--- NOVO: Passando as categorias para a view
+            'categorias' => $categorias,
         ]);
     }
 }

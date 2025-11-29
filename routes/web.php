@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProductImageController;
+use App\Http\Controllers\Usercontroller;
 use App\Livewire\Edit;
 use App\Models\Product;
 use Illuminate\Container\Attributes\Auth;

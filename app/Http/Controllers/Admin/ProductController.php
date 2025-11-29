@@ -13,23 +13,27 @@ class ProductController extends Controller
 {
     public function index()
     {
+        // Carrega produtos com a categoria para evitar queries N+1
         $produtos = Product::with('category')->latest()->paginate(10);
-        // Mantive o nome da view em PT como você já tinha
         return view('admin.produtos.lista', compact('produtos'));
     }
 
     public function create()
     {
         $categorias = Category::all();
-        return view('admin.produtos.create', compact('categorias'));
+        // Envia 'produto' como null para a view saber que é um cadastro novo
+        return view('admin.produtos.create', [
+            'categorias' => $categorias, 
+            'produto' => null
+        ]);
     }
 
+    // Este método é usado se o formulário for HTML padrão (sem Livewire submit)
     public function store(Request $request)
     {
-        // VALIDAÇÃO COM NOMES EM INGLÊS
         $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id', // Tabela 'categories'
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'image_path' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'description' => 'nullable|string',
@@ -38,13 +42,11 @@ class ProductController extends Controller
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name);
-        // Checkboxes usando os nomes novos (is_active, is_featured)
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('image_path') && $request->file('image_path')->isValid()) {
-            $imagePath = $request->file('image_path')->store('products', 'public'); // Pasta 'products'
-            $data['image_path'] = $imagePath;
+            $data['image_path'] = $request->file('image_path')->store('products', 'public');
         }
 
         Product::create($data);
@@ -52,15 +54,19 @@ class ProductController extends Controller
         return redirect()->route('produtos')->with('success', 'Produto cadastrado com sucesso!');
     }
 
-    public function edit(Product $produto)
+    // Ajustei o nome do parâmetro para $product para bater com a rota
+    public function edit(Product $product)
     {
         $categorias = Category::all();
-        return view('admin.produtos.create', compact('produto', 'categorias'));
+        // Reutiliza a view 'create', mas enviando os dados do produto
+        return view('admin.produtos.create', [
+            'categorias' => $categorias, 
+            'produto' => $product
+        ]);
     }
 
-    public function update(Request $request, Product $produto)
+    public function update(Request $request, Product $product)
     {
-        // VALIDAÇÃO COM NOMES EM INGLÊS
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -76,27 +82,27 @@ class ProductController extends Controller
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('image_path') && $request->file('image_path')->isValid()) {
-            // Apaga imagem antiga usando o nome do campo novo
-            if ($produto->image_path && Storage::disk('public')->exists($produto->image_path)) {
-                Storage::disk('public')->delete($produto->image_path);
+            // Apaga imagem antiga
+            if ($product->image_path && Storage::disk('public')->exists($product->image_path)) {
+                Storage::disk('public')->delete($product->image_path);
             }
-            $imagePath = $request->file('image_path')->store('products', 'public');
-            $data['image_path'] = $imagePath;
+            $data['image_path'] = $request->file('image_path')->store('products', 'public');
         } else {
+            // Remove o campo para não sobrescrever com null se não enviou imagem nova
             unset($data['image_path']);
         }
 
-        $produto->update($data);
+        $product->update($data);
 
         return redirect()->route('produtos')->with('success', 'Produto atualizado com sucesso!');
     }
 
-    public function destroy(Product $produto)
+    public function destroy(Product $product)
     {
-        if ($produto->image_path && Storage::disk('public')->exists($produto->image_path)) {
-            Storage::disk('public')->delete($produto->image_path);
+        if ($product->image_path && Storage::disk('public')->exists($product->image_path)) {
+            Storage::disk('public')->delete($product->image_path);
         }
-        $produto->delete();
+        $product->delete();
         return redirect()->route('produtos')->with('success', 'Produto excluído com sucesso!');
     }
 }
