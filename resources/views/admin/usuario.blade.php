@@ -6,7 +6,7 @@
     <hr>
 
 
-<livewire:lista-usuarios />
+<livewire:buscar-usuarios />
 
 
 @endsection

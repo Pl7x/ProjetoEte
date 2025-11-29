@@ -74,8 +74,12 @@ Route::middleware('auth')->group(function () {
     // --- Rotas de Usuários ---
     
     Route::get('/usuarios', [Usercontroller::class, 'index'])->name('usuarios');
+    
+    // 2. Criar
     Route::get('/usuarios/novo', [Usercontroller::class, 'create'])->name('usuarios.novo');
-
+    
+    // 3. Editar
+    Route::get('/usuarios/{user}/editar', [Usercontroller::class, 'edit'])->name('usuarios.edit');
 
     // --- Outras Rotas do Admin ---
 

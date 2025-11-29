@@ -57,12 +57,19 @@
                             </td>
                             <td>{{ $user->email }}</td>
                             <td class="text-center">
-                                @if($user->isOnline())
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Online</span>
-                                @else
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Offline</span>
-                                @endif
-                            </td>
+    @if($user->isOnline())
+        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Online</span>
+        <div class="small text-success mt-1" style="font-size: 0.75rem;">
+            Agora mesmo
+        </div>
+    @else
+        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Offline</span>
+        <div class="small text-muted mt-1" style="font-size: 0.75rem;">
+            {{-- Mostra "há X minutos/dias" ou "Nunca" --}}
+            {{ $user->last_activity ? $user->last_activity->diffForHumans() : 'Nunca acessou' }}
+        </div>
+    @endif
+</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     {{-- Botão Editar --}}

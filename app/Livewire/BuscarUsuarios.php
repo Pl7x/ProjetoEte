@@ -5,68 +5,52 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth; // Para não se excluir a si mesmo
+use Illuminate\Support\Facades\Auth;
 
 class BuscarUsuarios extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap'; // Importante para o visual
 
-    // Filtro de pesquisa
     public $search = '';
-
-    // Variáveis do Modal de Exclusão
     public $userIdToDelete;
     public $userNameToDelete;
 
-    // Reinicia a página ao pesquisar
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
+    public function updatingSearch() { $this->resetPage(); }
 
-    // Abre o modal de confirmação
     public function confirmDelete($userId)
     {
         $this->userIdToDelete = $userId;
-        $user = User::findOrFail($userId);
-        $this->userNameToDelete = $user->name;
-        $this->dispatch('show-delete-modal');
+        $user = User::find($userId);
+        if ($user) {
+            $this->userNameToDelete = $user->name;
+            $this->dispatch('show-delete-modal');
+        }
     }
 
-    // Efetua a exclusão
     public function deleteUser()
     {
-        if ($this->userIdToDelete) {
-            // Impede que o usuário exclua a si mesmo
-            if ($this->userIdToDelete == Auth::id()) {
-                session()->flash('error', 'Você não pode excluir sua própria conta!');
-                $this->dispatch('hide-delete-modal');
-                return;
-            }
-
+        if ($this->userIdToDelete == Auth::id()) {
+            session()->flash('error', 'Você não pode excluir sua própria conta!');
+        } else {
             User::destroy($this->userIdToDelete);
-            
             session()->flash('success', 'Usuário excluído com sucesso!');
-            $this->resetPage();
-            $this->dispatch('hide-delete-modal');
-            
-            // Limpa variáveis
-            $this->userIdToDelete = null;
-            $this->userNameToDelete = null;
         }
+        $this->dispatch('hide-delete-modal');
     }
 
     public function render()
     {
         $users = User::query()
-            ->when($this->search, function($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%');
+            ->when($this->search, function($q) {
+                $q->where('name', 'like', '%'.$this->search.'%')
+                  ->orWhere('email', 'like', '%'.$this->search.'%');
             })
             ->orderBy('name', 'asc')
             ->paginate(10);
 
-        return view('livewire.lista-usuarios', [
+        // CORREÇÃO: Usar o nome exato do seu arquivo de view
+        return view('livewire.buscar-usuarios', [
             'users' => $users
         ]);
     }
