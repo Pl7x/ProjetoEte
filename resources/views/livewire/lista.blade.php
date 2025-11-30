@@ -118,14 +118,14 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('produtos.edit', ['product' => $produto->id]) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center">
-                                        <i class="fas fa-edit me-2"></i> Editar
+                                    <a href="{{ route('produtos.edit', ['product' => $produto->id]) }}" class="btn btn-primary">
+                                        <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                                    <button type="button" class="btn btn-danger"
                                         wire:click="confirmDelete({{ $produto->id }})"
                                         wire:loading.attr="disabled"
                                         wire:target="confirmDelete({{ $produto->id }})">
-                                        <i class="fas fa-trash-alt me-2"></i> Excluir
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </td>

@@ -73,15 +73,15 @@
                             <td>
                                 <div class="d-flex gap-2">
                                     {{-- Botão Editar --}}
-                                    <a href="{{ route('usuarios.edit', $user->id) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center">
-                                        <i class="fas fa-edit me-2"></i> Editar
+                                    <a href="{{ route('usuarios.edit', $user->id) }}" class="btn btn-primary">
+                                        <i class="bi bi-pencil"></i>
                                     </a>
                                     
                                     {{-- Botão Excluir --}}
                                     @if(auth()->id() !== $user->id)
-                                        <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                                        <button type="button" class="btn btn-danger"
                                             wire:click="confirmDelete({{ $user->id }})">
-                                            <i class="fas fa-trash-alt me-2"></i> Excluir
+                                            <i class="bi bi-trash"></i> 
                                         </button>
                                     @else
                                         <span class="text-muted small ms-2">(Você)</span>
