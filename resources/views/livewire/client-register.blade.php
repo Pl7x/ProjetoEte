@@ -23,7 +23,13 @@
             </div>
             <div class="col-5">
                 <label class="form-label small fw-bold mb-0">CPF</label>
-                <input type="text" wire:model="cpf" class="form-control form-control-sm @error('cpf') is-invalid @enderror" placeholder="000.000.000-00">
+                {{-- MÁSCARA CPF --}}
+                <input type="text" 
+                       wire:model="cpf" 
+                       class="form-control form-control-sm @error('cpf') is-invalid @enderror" 
+                       placeholder="000.000.000-00"
+                       maxlength="14"
+                       onkeyup="mascaraCPF(this)">
                 @error('cpf') <span class="text-danger small">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -44,12 +50,25 @@
         <h6 class="text-warning fw-bold small mb-2 border-bottom pb-1 mt-3">Endereço</h6>
 
         <div class="row g-2 mb-2">
-            <div class="col-4">
+            {{-- CEP MAIS APARENTE --}}
+            <div class="col-5"> {{-- Aumentei um pouco a coluna --}}
                 <label class="form-label small fw-bold mb-0">CEP</label>
-                <input type="text" wire:model="cep" class="form-control form-control-sm @error('cep') is-invalid @enderror" placeholder="00000-000">
+                <div class="input-group input-group-sm">
+                    {{-- Ícone com fundo amarelo para destacar --}}
+                    <span class="input-group-text bg-warning text-dark fw-bold border-end-0">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </span>
+                    <input type="text" 
+                           wire:model="cep" 
+                           class="form-control form-control-sm border-start-0 @error('cep') is-invalid @enderror" 
+                           placeholder="00000-000"
+                           maxlength="9"
+                           onkeyup="mascaraCEP(this)">
+                </div>
                 @error('cep') <span class="text-danger small">{{ $message }}</span> @enderror
             </div>
-            <div class="col-8">
+
+            <div class="col-7">
                 <label class="form-label small fw-bold mb-0">Rua/Logradouro</label>
                 <input type="text" wire:model="endereco" class="form-control form-control-sm @error('endereco') is-invalid @enderror">
                 @error('endereco') <span class="text-danger small">{{ $message }}</span> @enderror
@@ -106,3 +125,27 @@
         </div>
     </form>
 </div>
+
+{{-- 
+    IMPORTANTE: Este script deve estar presente no arquivo. 
+    Sem ele, o 'onkeyup' não encontrará a função.
+--}}
+<script>
+    function mascaraCPF(i) {
+        let v = i.value;
+        v = v.replace(/\D/g, ""); // Remove tudo que não é dígito
+        v = v.replace(/(\d{3})(\d)/, "$1.$2"); // Coloca ponto entre o 3º e o 4º
+        v = v.replace(/(\d{3})(\d)/, "$1.$2"); // Coloca ponto entre o 6º e o 7º
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // Coloca traço entre o 9º e o 10º
+        i.value = v;
+        i.dispatchEvent(new Event('input')); // Avisa o Livewire que mudou
+    }
+
+    function mascaraCEP(i) {
+        let v = i.value;
+        v = v.replace(/\D/g, ""); // Remove tudo que não é dígito
+        v = v.replace(/^(\d{5})(\d)/, "$1-$2"); // Coloca traço após o 5º dígito
+        i.value = v;
+        i.dispatchEvent(new Event('input')); // Avisa o Livewire que mudou
+    }
+</script>
