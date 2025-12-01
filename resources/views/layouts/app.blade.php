@@ -7,7 +7,7 @@
 
     <title>{{ config('app.name', 'SuppStore') }} @yield('title')</title>
 
-    <!-- Google Fonts (Opcional: Inter para um visual mais moderno que o padrão do sistema) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -20,8 +20,6 @@
 
     <!-- Estilos Globais -->
     <style>
-
-
         :root {
             --bs-font-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
             --primary-color: #ffc107;
@@ -29,7 +27,6 @@
 
         body {
             font-family: var(--bs-font-sans-serif);
-            /* Garante o footer no final da página */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -39,12 +36,10 @@
             flex: 1;
         }
 
-        /* Melhorias na Navbar */
         .navbar-brand { letter-spacing: -0.5px; }
         .nav-link { font-weight: 500; }
         .nav-link.active { color: var(--primary-color) !important; }
 
-        /* Melhorias no Footer */
         footer a {
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
@@ -52,7 +47,6 @@
         }
         footer a:hover { color: var(--primary-color); }
         
-        /* Scrollbar personalizada */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -60,6 +54,10 @@
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    {{-- 1. FALTA ISSO: Estilos do Livewire --}}
+    @livewireStyles
+    
     @stack('styles')
 </head>
 
@@ -96,7 +94,13 @@
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="#" class="text-white opacity-75 hover-opacity-100 transition"><i class="bi bi-person fs-5"></i></a>
+                    {{-- 2. FALTA ISSO: Atributos para abrir o Modal ao clicar --}}
+                    <a href="#" class="text-white opacity-75 hover-opacity-100 transition" 
+                       data-bs-toggle="modal" 
+                       data-bs-target="#authModal">
+                        <i class="bi bi-person fs-5"></i>
+                    </a>
+
                     <a href="#" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold position-relative">
                         <i class="bi bi-bag-fill"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark">
@@ -113,12 +117,10 @@
         @yield('conteudo')
     </main>
 
-    <!-- Footer (Restaurado) -->
+    <!-- Footer -->
     <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
         <div class="container text-center text-md-start">
             <div class="row text-center text-md-start">
-
-                <!-- Logo e Slogan -->
                 <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold text-warning">
                         <i class="bi bi-fire"></i> SuppStore
@@ -126,7 +128,6 @@
                     <p>Sua jornada para uma vida mais saudável e forte começa aqui. Qualidade e confiança em suplementos.</p>
                 </div>
 
-                <!-- Institucional -->
                 <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold">Institucional</h5>
                     <p><a href="{{ route('sobre') }}">Sobre Nós</a></p>
@@ -134,7 +135,6 @@
                     <p><a href="{{ route('trocas') }}">Trocas e Devoluções</a></p>
                 </div>
 
-                <!-- Contato -->
                 <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold">Contato</h5>
                     <p><i class="bi bi-geo-alt-fill me-2 text-warning"></i> Rua Fitness, 123, São Paulo - SP</p>
@@ -164,10 +164,25 @@
         </div>
     </footer>
 
-    
+    {{-- 3. FALTA ISSO: O código do Modal em si --}}
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <livewire:auth-modal />
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    {{-- 4. FALTA ISSO: Scripts do Livewire (ESSENCIAL) --}}
+    @livewireScripts
     
     @stack('scripts')
 </body>

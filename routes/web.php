@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Usercontroller; // Importação corrigida para Ad
 use App\Http\Controllers\CatalogoController; // Importação do Catálogo
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AdminMiddleware;
 
 /*
 |--------------------------------------------------------------------------

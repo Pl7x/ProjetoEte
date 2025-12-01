@@ -17,11 +17,21 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
+protected $fillable = [
         'name',
         'email',
         'password',
-        'last_activity', // Adicionado last_activity ao fillable
+        'last_activity',
+        'is_admin',
+        // NOVOS CAMPOS:
+        'cpf',
+        'cep',
+        'endereco',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
     ];
 
     /**
