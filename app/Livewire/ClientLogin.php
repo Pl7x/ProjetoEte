@@ -20,25 +20,23 @@ class ClientLogin extends Component
     {
         $this->validate();
 
-        // Tenta logar. Se conseguir, recarrega a página atual.
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            
+            // Opcional: Se quiser impedir Admin de logar na loja
+            /*
+            if (Auth::user()->is_admin) {
+                Auth::logout();
+                $this->addError('email', 'Administradores devem logar pelo Painel.');
+                return;
+            }
+            */
+
             session()->regenerate();
             return redirect(request()->header('Referer'));
         }
 
         $this->addError('email', 'E-mail ou senha incorretos.');
     }
-
-    public function logout()
-    {
-        Auth::logout();
-        session()->invalidate();
-        session()->regenerateToken();
-        return redirect('/');
-    }
-
-    public function render()
-    {
-        return view('livewire.client-login');
-    }
+    
+    // ... resto do código igual ...
 }
