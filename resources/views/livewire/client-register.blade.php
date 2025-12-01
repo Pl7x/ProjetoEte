@@ -46,7 +46,6 @@
         <div class="row g-2 mb-2">
             <div class="col-4">
                 <label class="form-label small fw-bold mb-0">CEP</label>
-                {{-- No futuro, você pode adicionar wire:blur="buscaCep" aqui --}}
                 <input type="text" wire:model="cep" class="form-control form-control-sm @error('cep') is-invalid @enderror" placeholder="00000-000">
                 @error('cep') <span class="text-danger small">{{ $message }}</span> @enderror
             </div>
@@ -80,33 +79,15 @@
                 <label class="form-label small fw-bold mb-0">UF</label>
                 <select wire:model="estado" class="form-select form-select-sm @error('estado') is-invalid @enderror">
                     <option value="">--</option>
-                    <option value="AC">AC</option>
-                    <option value="AL">AL</option>
-                    <option value="AP">AP</option>
-                    <option value="AM">AM</option>
-                    <option value="BA">BA</option>
-                    <option value="CE">CE</option>
-                    <option value="DF">DF</option>
-                    <option value="ES">ES</option>
-                    <option value="GO">GO</option>
-                    <option value="MA">MA</option>
-                    <option value="MT">MT</option>
-                    <option value="MS">MS</option>
-                    <option value="MG">MG</option>
-                    <option value="PA">PA</option>
-                    <option value="PB">PB</option>
-                    <option value="PR">PR</option>
-                    <option value="PE">PE</option>
-                    <option value="PI">PI</option>
-                    <option value="RJ">RJ</option>
-                    <option value="RN">RN</option>
-                    <option value="RS">RS</option>
-                    <option value="RO">RO</option>
-                    <option value="RR">RR</option>
-                    <option value="SC">SC</option>
-                    <option value="SP">SP</option>
-                    <option value="SE">SE</option>
-                    <option value="TO">TO</option>
+                    <option value="AC">AC</option> <option value="AL">AL</option> <option value="AP">AP</option>
+                    <option value="AM">AM</option> <option value="BA">BA</option> <option value="CE">CE</option>
+                    <option value="DF">DF</option> <option value="ES">ES</option> <option value="GO">GO</option>
+                    <option value="MA">MA</option> <option value="MT">MT</option> <option value="MS">MS</option>
+                    <option value="MG">MG</option> <option value="PA">PA</option> <option value="PB">PB</option>
+                    <option value="PR">PR</option> <option value="PE">PE</option> <option value="PI">PI</option>
+                    <option value="RJ">RJ</option> <option value="RN">RN</option> <option value="RS">RS</option>
+                    <option value="RO">RO</option> <option value="RR">RR</option> <option value="SC">SC</option>
+                    <option value="SP">SP</option> <option value="SE">SE</option> <option value="TO">TO</option>
                 </select>
                 @error('estado') <span class="text-danger small">{{ $message }}</span> @enderror
             </div>

@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        // NOVO GUARD PARA CLIENTES
+        'client' => [
+            'driver' => 'session',
+            'provider' => 'clients',
+        ],
     ],
 
     /*
@@ -62,13 +68,14 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        // NOVO PROVIDER PARA CLIENTES
+        'clients' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Client::class, // Aponta para a nova Model
+        ],
     ],
 
     /*

@@ -20,23 +20,25 @@ class ClientLogin extends Component
     {
         $this->validate();
 
-        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-            
-            // Opcional: Se quiser impedir Admin de logar na loja
-            /*
-            if (Auth::user()->is_admin) {
-                Auth::logout();
-                $this->addError('email', 'Administradores devem logar pelo Painel.');
-                return;
-            }
-            */
-
+        // AQUI MUDAMOS: Usamos o guard 'client'
+        if (Auth::guard('client')->attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
             return redirect(request()->header('Referer'));
         }
 
         $this->addError('email', 'E-mail ou senha incorretos.');
     }
-    
-    // ... resto do código igual ...
+
+    public function logout()
+    {
+        Auth::guard('client')->logout(); // Logout específico do cliente
+        session()->invalidate();
+        session()->regenerateToken();
+        return redirect('/');
+    }
+
+    public function render()
+    {
+        return view('livewire.client-login');
+    }
 }

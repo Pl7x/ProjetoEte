@@ -1,15 +1,15 @@
 <div>
     @if($showRegister)
-        {{-- Se o interruptor estiver ligado, chama o Registro --}}
+        {{-- TELA DE REGISTRO --}}
         <livewire:client-register />
         
         <div class="text-center pb-3">
-            <a href="#" wire:click.prevent="toggleMode" class="text-decoration-none text-muted small">
+            <button wire:click="toggleMode" class="btn btn-link text-decoration-none text-muted small">
                 <i class="bi bi-arrow-left me-1"></i> Voltar para Login
-            </a>
+            </button>
         </div>
     @else
-        {{-- Se estiver desligado, chama o Login --}}
+        {{-- TELA DE LOGIN --}}
         <livewire:client-login />
         
         @guest 
