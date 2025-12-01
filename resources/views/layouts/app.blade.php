@@ -164,25 +164,50 @@
         </div>
     </footer>
 
-    {{-- 3. FALTA ISSO: O código do Modal em si --}}
-    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header border-bottom-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body pt-0">
+<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+        {{-- Mantemos modal-xl para ter espaço quando for registrar --}}
+        <div class="modal-dialog modal-dialog-centered modal-xl"> 
+            
+            {{-- MUDANÇA: bg-transparent, border-0 e shadow-none tornam o container invisível --}}
+            <div class="modal-content bg-transparent border-0 shadow-none">
+                <div class="modal-body p-0">
                     <livewire:auth-modal />
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    {{-- 4. FALTA ISSO: Scripts do Livewire (ESSENCIAL) --}}
     @livewireScripts
+    
+    {{-- 
+        4. SOLUÇÃO DEFINITIVA DA MÁSCARA 
+        Coloque este script AQUI, no layout principal, antes de fechar o body.
+        Isso garante que as funções existam sempre, não importa o componente.
+    --}}
+    <script>
+        function mascaraCPF(i) {
+            var v = i.value;
+            if(v.length > 14) { i.value = v.substring(0, 14); return; }
+            v = v.replace(/\D/g, ""); 
+            v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
+            v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); 
+            i.value = v;
+            i.dispatchEvent(new Event('input')); // Avisa o Livewire
+        }
+
+        function mascaraCEP(i) {
+            var v = i.value;
+            if(v.length > 9) { i.value = v.substring(0, 9); return; }
+            v = v.replace(/\D/g, ""); 
+            v = v.replace(/^(\d{5})(\d)/, "$1-$2"); 
+            i.value = v;
+            i.dispatchEvent(new Event('input')); // Avisa o Livewire
+        }
+    </script>
     
     @stack('scripts')
 </body>
