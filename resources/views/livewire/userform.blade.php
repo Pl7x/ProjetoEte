@@ -1,5 +1,5 @@
 <div> {{-- Esta div raiz é OBRIGATÓRIA --}}
-    
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 border-0 border-start border-5 border-success d-flex align-items-center" role="alert">
             <i class="bi bi-check-circle-fill me-2 fs-5"></i>
@@ -9,11 +9,10 @@
     @endif
 
     <form wire:submit.prevent="save">
-        
-        {{-- Cabeçalho do Card --}}
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h3 mb-0 text-gray-800 fw-bold">
-                {{-- Título Vazio intencional ou coloque um título aqui --}}
+                {{-- Título --}}
             </h2>
             <a href="{{ route('usuarios') }}" class="btn btn-outline-secondary shadow-sm d-flex align-items-center">
                 <i class="bi bi-arrow-left me-2"></i> Voltar
@@ -28,22 +27,39 @@
                     <div class="card-header bg-white py-3 d-flex align-items-center border-bottom-0">
                         <h5 class="m-0 fw-bold text-primary">
                             @if($user)
-                                <i class="bi bi-person-gear me-2"></i>Editar Usuário
+                                {{-- Título: Editando --}}
+                                <i class="bi bi-person-gear me-2"></i>Editar Usuário: <span class="text-dark">{{ $user->name }}</span>
                             @else
+                                {{-- Título: Novo --}}
                                 <i class="bi bi-person-plus me-2"></i>Novo Usuário
                             @endif
                         </h5>
                     </div>
-                    
+
                     <div class="card-body p-4">
                         <div class="row g-3">
                             {{-- Nome --}}
                             <div class="col-12">
                                 <label class="form-label fw-semibold text-secondary">Nome Completo*</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
-                                    <input type="text" class="form-control border-start-0 ps-0 @error('name') is-invalid @enderror" wire:model="name" placeholder="Ex: Maria Silva" required>
+                                    {{-- ÍCONE: Aplica a mesma cor de fundo #e9ecef se for edição --}}
+                                    <span class="input-group-text border-end-0"
+                                          @if($user) style="background-color: #e9ecef;" @else class="bg-light" @endif>
+                                        <i class="bi bi-person {{ $user ? 'text-muted' : '' }}"></i>
+                                    </span>
+
+                                    {{-- INPUT: Aplica readonly e a cor de fundo #e9ecef --}}
+                                    <input type="text"
+                                           class="form-control border-start-0 ps-0 @error('name') is-invalid @enderror {{ $user ? 'text-muted' : '' }}"
+                                           wire:model="name"
+                                           placeholder="Ex: Maria Silva"
+                                           required
+                                           @if($user) readonly style="background-color: #e9ecef;" @endif
+                                    >
                                 </div>
+                                @if($user)
+                                    <small class="text-muted mt-1 d-block"><i class="bi bi-lock-fill me-1"></i>O nome não pode ser alterado.</small>
+                                @endif
                                 @error('name') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
 

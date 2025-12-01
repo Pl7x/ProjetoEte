@@ -12,9 +12,7 @@ class UserForm extends Component
 {
     use WithFileUploads;
 
-    public ?User $user = null; // Variável que armazena o objeto User (se for edição)
-
-    // Variáveis ligadas aos campos do formulário (wire:model)
+    public ?User $user = null;
     public $name;
     public $email;
     public $password;
@@ -22,61 +20,59 @@ class UserForm extends Component
     protected function rules()
     {
         return [
+            // Se for edição, o nome é required mas nós não o atualizaremos,
+            // então a validação apenas garante que o campo não venha vazio do front.
             'name' => 'required|string|max:255',
             'email' => [
-                'required', 
-                'email', 
-                'max:255', 
-                // Único na tabela users, ignorando o ID atual se for edição
+                'required',
+                'email',
+                'max:255',
                 Rule::unique('users', 'email')->ignore($this->user?->id)
             ],
-            // Senha obrigatória apenas no cadastro (create)
             'password' => $this->user ? 'nullable|min:6' : 'required|min:6',
         ];
     }
 
-    // --- AQUI ESTÁ A CORREÇÃO ---
-    // Este método roda automaticamente ao carregar o componente.
-    // Ele pega o usuário enviado pela rota/controller e preenche os campos.
     public function mount($user = null)
     {
         if ($user) {
-            // MODO EDIÇÃO: Preenche os campos com os dados do banco
             $this->user = $user;
             $this->name = $user->name;
             $this->email = $user->email;
         }
     }
 
-    // ...
-public function save()
-{
-    
-    $this->validate(); // Se falhar aqui, ele para e mostra erros na view
+    public function save()
+    {
+        $this->validate();
 
-    $data = [
-        'name' => $this->name,
-        'email' => $this->email,
-    ];
+        // Dados comuns para atualização
+        $data = [
+            'email' => $this->email,
+        ];
 
-    if (!empty($this->password)) {
-        $data['password'] = Hash::make($this->password);
+        // Se senha foi preenchida, adiciona ao array de dados
+        if (!empty($this->password)) {
+            $data['password'] = Hash::make($this->password);
+        }
+
+        if ($this->user) {
+            // MODO EDIÇÃO: Não incluímos 'name' no $data,
+            // garantindo que o nome original permaneça inalterado no banco.
+            $this->user->update($data);
+            session()->flash('success', 'Usuário atualizado!');
+        } else {
+            // MODO CRIAÇÃO: Adicionamos o nome
+            $data['name'] = $this->name;
+            User::create($data);
+            session()->flash('success', 'Usuário criado!');
+        }
+
+        return redirect()->route('usuarios');
     }
-
-    if ($this->user) {
-        $this->user->update($data);
-        session()->flash('success', 'Usuário atualizado!');
-    } else {
-        User::create($data); // <--- O erro pode estar aqui se o banco não permitir nulos
-        session()->flash('success', 'Usuário criado!');
-    }
-
-    return redirect()->route('usuarios');
-}
 
     public function render()
-{
-    // O nome aqui deve ser igual ao nome do arquivo na pasta views/livewire
-    return view('livewire.userform'); 
-}
+    {
+        return view('livewire.userform');
+    }
 }
