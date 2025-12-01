@@ -145,6 +145,26 @@
         </div>
     </div>
 
+    <div>
+    {{-- Adicione este bloco logo no início da div do componente --}}
+
+    @if (session()->has('success'))
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- ... o resto do seu código de filtros e produtos vem aqui ... --}}
+    <div class="container py-5">
+
     {{-- --- MODAL QUICK VIEW (ADICIONADA AQUI) --- --}}
     <div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-lg modal-dialog-centered">

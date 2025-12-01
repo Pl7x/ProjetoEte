@@ -6,6 +6,7 @@ use App\Http\Controllers\CatalogoController; // Importação do Catálogo
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
+use App\Livewire\Carrinho;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,12 @@ Route::get('/politicas', function () {
 })->name('politicas');
 
 
+
+Route::middleware('auth:client')->group(function () {
+
+Route::get('/carrinho', Carrinho::class)->name('carrinho');
+
+});
 /*
 |--------------------------------------------------------------------------
 | Rotas Protegidas (Painel Admin)
@@ -55,7 +62,7 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 
     // --- Rotas de Produtos ---
-    
+
     // 1. Listagem
     Route::get('/produtos', [ProductController::class, 'index'])->name('produtos');
 
@@ -73,16 +80,16 @@ Route::middleware('auth')->group(function () {
 
 
     // --- Rotas de Usuários ---
-    
+
     Route::get('/usuarios', [Usercontroller::class, 'index'])->name('usuarios');
-    
+
     // 2. Criar
     Route::get('/usuarios/novo', [Usercontroller::class, 'create'])->name('usuarios.novo');
-    
+
     // 3. Editar
     Route::get('/usuarios/{user}/editar', [Usercontroller::class, 'edit'])->name('usuarios.edit');
 
- 
+
 
     Route::get('/pedidos', function () {
         return view('admin.pedidos');
@@ -92,4 +99,11 @@ Route::middleware('auth')->group(function () {
         return view('admin.relatorios');
     })->name('relatorio');
 
-});
+
+
+
+}
+
+
+
+);

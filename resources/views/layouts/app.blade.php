@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    <!-- ... (seu head existente) ... -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -14,7 +15,7 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -46,7 +47,7 @@
             transition: color 0.2s;
         }
         footer a:hover { color: var(--primary-color); }
-        
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -54,10 +55,10 @@
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     {{-- 1. FALTA ISSO: Estilos do Livewire --}}
     @livewireStyles
-    
+
     @stack('styles')
 </head>
 
@@ -70,7 +71,7 @@
                 <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
                 SuppStore
             </a>
-            
+
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -89,14 +90,14 @@
                             <li><a class="dropdown-item fw-bold" href="{{ route('catalogo') }}">Ver Tudo</a></li>
                         </ul>
                     </li>
-                    
+
                     <li class="nav-item"><a class="nav-link" href="{{ route('sobre') }}">Blog</a></li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
                     {{-- 2. FALTA ISSO: Atributos para abrir o Modal ao clicar --}}
-                    <a href="#" class="text-white opacity-75 hover-opacity-100 transition" 
-                       data-bs-toggle="modal" 
+                    <a href="#" class="text-white opacity-75 hover-opacity-100 transition"
+                       data-bs-toggle="modal"
                        data-bs-target="#authModal">
                         <i class="bi bi-person fs-5"></i>
                     </a>
@@ -166,8 +167,8 @@
 
 <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
         {{-- Mantemos modal-xl para ter espaço quando for registrar --}}
-        <div class="modal-dialog modal-dialog-centered modal-xl"> 
-            
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+
             {{-- MUDANÇA: bg-transparent, border-0 e shadow-none tornam o container invisível --}}
             <div class="modal-content bg-transparent border-0 shadow-none">
                 <div class="modal-body p-0">
@@ -179,36 +180,64 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     @livewireScripts
-    
-    {{-- 
-        4. SOLUÇÃO DEFINITIVA DA MÁSCARA 
-        Coloque este script AQUI, no layout principal, antes de fechar o body.
-        Isso garante que as funções existam sempre, não importa o componente.
-    --}}
+
     <script>
+        // MÁSCARAS
         function mascaraCPF(i) {
             var v = i.value;
             if(v.length > 14) { i.value = v.substring(0, 14); return; }
-            v = v.replace(/\D/g, ""); 
-            v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
-            v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); 
+            v = v.replace(/\D/g, "");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
             i.value = v;
-            i.dispatchEvent(new Event('input')); // Avisa o Livewire
+            i.dispatchEvent(new Event('input'));
         }
 
         function mascaraCEP(i) {
             var v = i.value;
             if(v.length > 9) { i.value = v.substring(0, 9); return; }
-            v = v.replace(/\D/g, ""); 
-            v = v.replace(/^(\d{5})(\d)/, "$1-$2"); 
+            v = v.replace(/\D/g, "");
+            v = v.replace(/^(\d{5})(\d)/, "$1-$2");
             i.value = v;
-            i.dispatchEvent(new Event('input')); // Avisa o Livewire
+            i.dispatchEvent(new Event('input'));
         }
+
+        // --- EVENTOS DE MODAL (ADICIONADO) ---
+        document.addEventListener('livewire:initialized', () => {
+
+            // Ouvir evento para abrir modal de login
+            Livewire.on('trigger-login-modal', () => {
+
+                // 1. Tenta fechar o Quick View se estiver aberto
+                var quickEl = document.getElementById('quickViewModal');
+                if(quickEl) {
+                    var quickModal = bootstrap.Modal.getInstance(quickEl);
+                    if(quickModal) quickModal.hide();
+                }
+
+                // 2. Abre o modal de Auth
+                var authEl = document.getElementById('authModal');
+                if(authEl) {
+                    var authModal = bootstrap.Modal.getOrCreateInstance(authEl);
+                    authModal.show();
+                }
+            });
+
+            // Ouvir evento para fechar Quick View após sucesso
+            Livewire.on('close-quick-view', () => {
+                var quickEl = document.getElementById('quickViewModal');
+                if(quickEl) {
+                    var quickModal = bootstrap.Modal.getInstance(quickEl);
+                    if(quickModal) quickModal.hide();
+                }
+            });
+
+        });
     </script>
-    
+
     @stack('scripts')
 </body>
 </html>
