@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
     // 3. Editar
     Route::get('/usuarios/{user}/editar', [Usercontroller::class, 'edit'])->name('usuarios.edit');
 
-    // --- Outras Rotas do Admin ---
+ 
 
     Route::get('/pedidos', function () {
         return view('admin.pedidos');
