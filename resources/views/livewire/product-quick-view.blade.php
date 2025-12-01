@@ -3,14 +3,9 @@
     @if($product)
         {{-- Verifica se a quantidade atual excede o estoque --}}
         @php
-            // Garante que quantity seja um número para evitar erros
-            $qtd = intval($quantity);
-            $stock = $product->stock_quantity;
-            $isOverStock = $qtd > $stock;
-            // Quantidade inválida se for menor que 1 (exceto se estoque for 0 e qtd for 0, mas a lógica de validação cuida disso)
-            // ou se exceder o estoque.
-            $isInvalidQuantity = $qtd < 1 || $isOverStock;
-            $hasNoStock = $stock <= 0;
+            $isOverStock = $quantity > $product->stock_quantity;
+            $isInvalidQuantity = $quantity < 1 || $isOverStock;
+            $hasNoStock = $product->stock_quantity <= 0;
         @endphp
 
         <div class="modal-header border-2 pb-12">
@@ -41,7 +36,6 @@
                     {{-- MUDANÇA 1: Preço Dinâmico --}}
                     <div class="mb-4 bg-light p-3 rounded-3">
                          {{-- Exibe o preço total calculado no PHP --}}
-                         {{-- Acessamos a propriedade computada como $this->totalPrice --}}
                          <h2 class="fw-bold text-dark mb-0">
                             R$ {{ number_format($this->totalPrice, 2, ',', '.') }}
                          </h2>
@@ -53,67 +47,64 @@
                          @endif
                     </div>
 
-                    {{-- Seletor de Quantidade Visual --}}
-                    <div class="d-flex flex-column gap-2 mb-4">
-                        <label class="small fw-bold {{ $isOverStock ? 'text-danger' : 'text-muted' }}">
-                            Quantidade:
-                        </label>
+                                            {{-- Seletor de Quantidade Visual --}}
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <label class="small fw-bold {{ $isOverStock ? 'text-danger' : 'text-muted' }}">
+                                Quantidade:
+                            </label>
 
-                        <div class="d-flex align-items-center gap-3">
-                            {{-- MUDANÇA AQUI: Aumentei a largura de 140px para 180px --}}
-                            <div class="input-group" style="width: 180px;">
-                                <button class="btn btn-outline-secondary border-light-subtle bg-light"
-                                        type="button"
-                                        wire:click="decrement"
-                                        @if($quantity <= 1) disabled @endif>
-                                    <i class="bi bi-dash"></i>
-                                </button>
+                            <div class="d-flex align-items-center gap-3">
+                                {{-- MUDANÇA AQUI: Aumentei a largura de 140px para 180px --}}
+                                <div class="input-group" style="width: 180px;">
+                                    <button class="btn btn-outline-secondary border-light-subtle bg-light"
+                                            type="button"
+                                            wire:click="decrement"
+                                            @if($quantity <= 1) disabled @endif>
+                                        <i class="bi bi-dash"></i>
+                                    </button>
 
-                                {{-- O input já usa a classe is-invalid do Bootstrap automaticamente graças ao @error --}}
-                                <input type="number"
-                                    min="1"
-                                    {{-- Removemos o max="" do HTML para permitir que o usuário digite e veja o erro --}}
-                                    class="form-control text-center bg-light border-light-subtle fw-bold no-spinners @error('quantity') is-invalid @enderror"
-                                    wire:model.live.debounce.500ms="quantity"
-                                    @if($hasNoStock) disabled @endif>
+                                    {{-- O input já usa a classe is-invalid do Bootstrap automaticamente graças ao @error --}}
+                                    <input type="number"
+                                        min="1"
+                                        {{-- Removemos o max="" do HTML para permitir que o usuário digite e veja o erro --}}
+                                        class="form-control text-center bg-light border-light-subtle fw-bold no-spinners @error('quantity') is-invalid @enderror"
+                                        wire:model.live.debounce.500ms="quantity"
+                                        @if($hasNoStock) disabled @endif>
 
-                                <button class="btn btn-outline-secondary border-light-subtle bg-light"
-                                        type="button"
-                                        wire:click="increment"
-                                        {{-- Desabilita se já estiver no limite ou acima dele --}}
-                                        @if($quantity >= $product->stock_quantity) disabled @endif>
-                                    <i class="bi bi-plus"></i>
-                                </button>
+                                    <button class="btn btn-outline-secondary border-light-subtle bg-light"
+                                            type="button"
+                                            wire:click="increment"
+                                            {{-- Desabilita se já estiver no limite ou acima dele --}}
+                                            @if($quantity >= $product->stock_quantity) disabled @endif>
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                                {{-- MUDANÇA 3: Texto do estoque fica vermelho e em negrito se excedido --}}
+                                <span class="small transition-all {{ $isOverStock ? 'text-danger fw-bold' : 'text-muted' }}">
+                                    @if($hasNoStock)
+                                        <span class="badge bg-danger">Esgotado</span>
+                                    @else
+                                        ({{ $product->stock_quantity }} disponíveis)
+                                    @endif
+                                </span>
                             </div>
-                            {{-- MUDANÇA 3: Texto do estoque fica vermelho e em negrito se excedido --}}
-                            <span class="small transition-all {{ $isOverStock ? 'text-danger fw-bold' : 'text-muted' }}">
-                                @if($hasNoStock)
-                                    <span class="badge bg-danger">Esgotado</span>
-                                @else
-                                    ({{ $product->stock_quantity }} disponíveis)
-                                @endif
-                            </span>
+
+                            {{-- Mensagem de erro de validação --}}
+                            @error('quantity')
+                                <div class="text-danger small fw-bold animate-bounce">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ $message }}
+                                </div>
+                            @enderror
                         </div>
-
-                        {{-- Mensagem de erro de validação --}}
-                        @error('quantity')
-                            <div class="text-danger small fw-bold animate-bounce">
-                                <i class="bi bi-exclamation-circle-fill me-1"></i> {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
 
                     {{-- Botões de Ação --}}
                     <div class="d-flex gap-2 flex-column flex-sm-row">
                         {{-- MUDANÇA 4: Desabilita os botões se a quantidade for inválida ou não tiver estoque --}}
-                        {{-- Adicionei wire:click="addToCart" em ambos os botões --}}
                         <button class="btn btn-primary rounded-pill fw-bold py-2 px-4 flex-grow-1"
-                                wire:click="addToCart"
                                 @if($isInvalidQuantity || $hasNoStock) disabled @endif>
                            <i class="bi bi-bag-check me-2"></i> Comprar Agora
                         </button>
                         <button class="btn btn-dark rounded-pill fw-bold py-2 px-4 flex-grow-1"
-                                wire:click="addToCart"
                                 @if($isInvalidQuantity || $hasNoStock) disabled @endif>
                            <i class="bi bi-cart-plus me-2"></i> Adicionar ao Carrinho
                         </button>

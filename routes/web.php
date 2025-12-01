@@ -6,7 +6,6 @@ use App\Http\Controllers\CatalogoController; // Importação do Catálogo
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
-use App\Livewire\Carrinho;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,12 +38,6 @@ Route::get('/politicas', function () {
 })->name('politicas');
 
 
-
-Route::middleware('auth:client')->group(function () {
-
-Route::get('/carrinho', Carrinho::class)->name('carrinho');
-
-});
 /*
 |--------------------------------------------------------------------------
 | Rotas Protegidas (Painel Admin)
@@ -99,11 +92,4 @@ Route::middleware('auth')->group(function () {
         return view('admin.relatorios');
     })->name('relatorio');
 
-
-
-
-}
-
-
-
-);
+});
