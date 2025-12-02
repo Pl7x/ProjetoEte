@@ -95,19 +95,36 @@
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
-                    {{-- 2. FALTA ISSO: Atributos para abrir o Modal ao clicar --}}
-                    <a href="#" class="text-white opacity-75 hover-opacity-100 transition"
-                       data-bs-toggle="modal"
-                       data-bs-target="#authModal">
+                    {{-- Botão de Login / Perfil --}}
+                    <a href="#" class="text-white opacity-75 hover-opacity-100 transition" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#authModal">
                         <i class="bi bi-person fs-5"></i>
                     </a>
 
-                    <a href="#" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold position-relative">
+                    {{-- 
+                        BOTÃO DO CARRINHO (AGORA SEMPRE ABRE O OFFCANVAS)
+                        A lógica de bloqueio está dentro do componente cart-bar.
+                    --}}
+                    <a href="#" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold position-relative"
+                    data-bs-toggle="offcanvas" 
+                    data-bs-target="#cartOffcanvas">
                         <i class="bi bi-bag-fill"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark">
-                            0
-                        </span>
+                        
+                        {{-- Só mostra a contagem se estiver logado --}}
+                        @if(Auth::guard('client')->check())
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark">
+                                {{ count(session('cart', [])) }}
+                            </span>
+                        @else
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary border border-dark">
+                                <i class="bi bi-lock-fill" style="font-size: 0.6rem;"></i>
+                            </span>
+                        @endif
                     </a>
+                </div>
+
+
                 </div>
             </div>
         </div>
@@ -180,12 +197,12 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<livewire:cart-bar />
     @livewireScripts
 
-    <script>
-        // MÁSCARAS
-        function mascaraCPF(i) {
+   <script>
+
+    function mascaraCPF(i) {
             var v = i.value;
             if(v.length > 14) { i.value = v.substring(0, 14); return; }
             v = v.replace(/\D/g, "");
@@ -205,38 +222,29 @@
             i.dispatchEvent(new Event('input'));
         }
 
-        // --- EVENTOS DE MODAL (ADICIONADO) ---
-        document.addEventListener('livewire:initialized', () => {
 
-            // Ouvir evento para abrir modal de login
-            Livewire.on('trigger-login-modal', () => {
 
-                // 1. Tenta fechar o Quick View se estiver aberto
-                var quickEl = document.getElementById('quickViewModal');
-                if(quickEl) {
-                    var quickModal = bootstrap.Modal.getInstance(quickEl);
-                    if(quickModal) quickModal.hide();
-                }
 
-                // 2. Abre o modal de Auth
-                var authEl = document.getElementById('authModal');
-                if(authEl) {
-                    var authModal = bootstrap.Modal.getOrCreateInstance(authEl);
-                    authModal.show();
-                }
-            });
-
-            // Ouvir evento para fechar Quick View após sucesso
-            Livewire.on('close-quick-view', () => {
-                var quickEl = document.getElementById('quickViewModal');
-                if(quickEl) {
-                    var quickModal = bootstrap.Modal.getInstance(quickEl);
-                    if(quickModal) quickModal.hide();
-                }
-            });
-
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('open-auth-modal', () => {
+            const el = document.getElementById('quickViewModal');
+            if (el) bootstrap.Modal.getInstance(el)?.hide();
+            const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            authModal.show();
         });
-    </script>
+
+        Livewire.on('close-quick-view', () => {
+            const el = document.getElementById('quickViewModal');
+            if (el) bootstrap.Modal.getInstance(el)?.hide();
+        });
+
+        Livewire.on('open-cart', () => {
+            const el = document.getElementById('cartOffcanvas');
+            const offcanvas = new bootstrap.Offcanvas(el);
+            offcanvas.show();
+        });
+    });
+</script>
 
     @stack('scripts')
 </body>

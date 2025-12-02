@@ -57,7 +57,38 @@ class CatalogoProdutos extends Component
 
     // Opcional: Método para resetar o ID quando a modal fechar
     // public function closeQuickView() { $this->selectedProductId = null; }
+    public function addToCart($productId)
+    {
+        $product = Product::find($productId);
 
+        if (!$product) {
+            return;
+        }
+
+        $cart = session()->get('cart', []);
+
+        // Se o produto já existe no carrinho, aumenta a quantidade
+        if (isset($cart[$productId])) {
+            $cart[$productId]['quantity']++;
+        } else {
+            // Se não existe, adiciona novo
+            $cart[$productId] = [
+                'name' => $product->name,
+                'quantity' => 1,
+                'price' => $product->price,
+                'image' => $product->image_path
+            ];
+        }
+
+        session()->put('cart', $cart);
+
+        // Dispara evento para o componente do carrinho atualizar e abre o menu lateral
+        $this->dispatch('cart-updated'); 
+        $this->dispatch('open-cart'); // Vamos criar esse script abaixo
+        
+        // Feedback visual (opcional)
+        session()->flash('success', 'Produto adicionado!');
+    }
     public function render()
     {
         $query = Product::query();

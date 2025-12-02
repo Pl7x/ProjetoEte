@@ -4,81 +4,68 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 
 class ProductQuickView extends Component
 {
-    public $product = null;
+    public $product;
     public $quantity = 1;
-    public $productId = null;
 
-    // O método mount e loadProduct permanecem iguais
     public function mount($productId)
     {
-        $this->productId = $productId;
-        $this->loadProduct();
+        $this->product = Product::find($productId);
     }
 
-    public function loadProduct()
+    // Validação do campo digitável
+    public function updatedQuantity()
     {
-        $this->product = Product::find($this->productId);
-        // Reseta a quantidade para 1 ao carregar, ou 0 se não tiver estoque
-        $this->quantity = ($this->product && $this->product->stock_quantity > 0) ? 1 : 0;
-        $this->resetErrorBag();
+        if (!$this->quantity || $this->quantity < 1) $this->quantity = 1;
+        if ($this->quantity > $this->product->stock_quantity) $this->quantity = $this->product->stock_quantity;
     }
 
-    // --- NOVO: Propriedade Computada para o Preço Total ---
-    // No Livewire, métodos getXProperty são acessados na view como $this->X
-    public function getTotalPriceProperty()
+    public function increment() {
+        if ($this->quantity < $this->product->stock_quantity) $this->quantity++;
+    }
+
+    public function decrement() {
+        if ($this->quantity > 1) $this->quantity--;
+    }
+
+    public function addToCart()
     {
-        // Se não tiver produto ou a quantidade for inválida, retorna 0
-        if (!$this->product || !is_numeric($this->quantity) || $this->quantity < 1) {
-            return 0;
+        // 1. VERIFICAÇÃO DE LOGIN
+        if (!Auth::guard('client')->check()) {
+            // Fecha o QuickView e abre o Login
+            $this->dispatch('close-quick-view');
+            $this->dispatch('open-auth-modal');
+            return;
         }
 
-        // Calcula: Preço Unitário * Quantidade Atual
-        return $this->product->price * intval($this->quantity);
-    }
-    // ------------------------------------------------------
+        // 2. ADICIONAR AO CARRINHO
+        $this->updatedQuantity(); // Garante que o número está certo
+        
+        $cart = session()->get('cart', []);
+        $id = $this->product->id;
 
-    // Validação atualizada para permitir o feedback visual vermelho
-    public function updatedQuantity($value)
-    {
-        $this->resetErrorBag('quantity');
-        $intValue = intval($value);
-        $stock = $this->product->stock_quantity;
-
-        if ($intValue < 1) {
-            $this->quantity = 1;
-            // Se o estoque for 0, força 0
-            if($stock === 0) $this->quantity = 0;
-
-        } elseif ($intValue > $stock) {
-            // MUDANÇA: Permitimos que a variável $quantity fique maior que o estoque
-            // momentaneamente para que o input fique vermelho na view.
-            $this->quantity = $intValue;
-            // Adicionamos o erro
-            $this->addError('quantity', "Estoque insuficiente. Máximo: {$stock}.");
+        if (isset($cart[$id])) {
+            $cart[$id]['quantity'] += $this->quantity;
         } else {
-            $this->quantity = $intValue;
+            $cart[$id] = [
+                'name' => $this->product->name,
+                'price' => $this->product->price,
+                'quantity' => $this->quantity,
+                'image' => $this->product->image_path
+            ];
         }
-    }
 
-    public function increment()
-    {
-        $this->resetErrorBag('quantity');
-        // Só incrementa se for menor que o estoque
-        if ($this->quantity < $this->product->stock_quantity) {
-            $this->quantity++;
-        }
-        // Se tentar incrementar no limite, a validação visual na view cuidará do resto
-    }
+        session()->put('cart', $cart);
 
-    public function decrement()
-    {
-        $this->resetErrorBag('quantity');
-        if ($this->quantity > 1) {
-            $this->quantity--;
-        }
+        // 3. FEEDBACK
+        $this->dispatch('cart-updated');
+        $this->dispatch('close-quick-view');
+        $this->dispatch('open-cart'); // Abre o carrinho lateral
+        
+        $this->quantity = 1;
     }
 
     public function render()
