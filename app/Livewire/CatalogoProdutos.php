@@ -4,9 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Url; // <--- ADICIONADO: Importação necessária
 use App\Models\Product;
 use App\Models\Category;
-// use App\Models\Brand; // Se tiver o model Brand
 
 class CatalogoProdutos extends Component
 {
@@ -14,13 +14,17 @@ class CatalogoProdutos extends Component
 
     // Filtros existentes
     public $search = '';
-    public $sort = 'relevancia'; // Define 'relevancia' como o padrão inicial
+    public $sort = 'relevancia';
+
+    // MUDANÇA AQUI: Adicionamos o atributo #[Url]
+    // Isso faz com que o Livewire leia e escreva na barra de endereço (?categoria=ID)
+    #[Url(as: 'categoria')] 
     public $categoryFilter = null;
+
     public $minPrice = null;
     public $maxPrice = null;
-    // public $selectedBrands = []; // Se for usar marcas
 
-    // NOVO: Propriedade para armazenar o ID do produto selecionado para a modal
+    // Propriedade para armazenar o ID do produto selecionado para a modal
     public $selectedProductId = null;
 
     // Resetar paginação ao filtrar
@@ -29,34 +33,22 @@ class CatalogoProdutos extends Component
     public function updatingSort() { $this->resetPage(); }
     public function updatingMinPrice() { $this->resetPage(); }
     public function updatingMaxPrice() { $this->resetPage(); }
-    // public function updatingSelectedBrands() { $this->resetPage(); }
 
     // Método para limpar filtros
     public function resetFilters()
     {
-        // O método reset() volta as propriedades para seus valores padrão definidos no início da classe.
-        // Isso limpará a busca, categoria, preços e voltará o sort para 'relevancia'.
         $this->reset(['search', 'categoryFilter', 'sort', 'minPrice', 'maxPrice']);
-
-        // Se usar marcas, adicione na lista:
-        // $this->reset(['search', 'categoryFilter', 'sort', 'minPrice', 'maxPrice', 'selectedBrands']);
-
         $this->resetPage();
     }
 
-    // NOVO: Método chamado ao clicar no botão "Comprar"
+    // Método chamado ao clicar no botão "Comprar" (Visualizar)
     public function openQuickView($productId)
     {
-        // 1. Define o ID do produto selecionado. Isso fará com que o componente
-        //    'product-quick-view' seja renderizado na view.
         $this->selectedProductId = $productId;
-
-        // 2. Dispara um evento para o navegador (JS) abrir a modal do Bootstrap.
         $this->dispatch('show-quick-view-modal');
     }
 
-    // Opcional: Método para resetar o ID quando a modal fechar
-    // public function closeQuickView() { $this->selectedProductId = null; }
+    // Método para adicionar ao carrinho
     public function addToCart($productId)
     {
         $product = Product::find($productId);
@@ -84,11 +76,12 @@ class CatalogoProdutos extends Component
 
         // Dispara evento para o componente do carrinho atualizar e abre o menu lateral
         $this->dispatch('cart-updated'); 
-        $this->dispatch('open-cart'); // Vamos criar esse script abaixo
+        $this->dispatch('open-cart');
         
         // Feedback visual (opcional)
         session()->flash('success', 'Produto adicionado!');
     }
+
     public function render()
     {
         $query = Product::query();
@@ -108,34 +101,24 @@ class CatalogoProdutos extends Component
 
         // 3. Filtro de Faixa de Preço
         if ($this->minPrice) {
-            // Garante que é um número e filtra maior ou igual
             $query->where('price', '>=', (float) $this->minPrice);
         }
         if ($this->maxPrice) {
-             // Garante que é um número e filtra menor ou igual
             $query->where('price', '<=', (float) $this->maxPrice);
         }
-
-        // 4. Filtro de Marcas (Se houver)
-        // if (!empty($this->selectedBrands)) {
-        //      $query->whereIn('brand_id', $this->selectedBrands);
-        // }
 
         // 5. Aplica a ordenação baseada na propriedade $sort
         $query->when($this->sort === 'price_asc', fn($q) => $q->orderBy('price', 'asc'))
               ->when($this->sort === 'price_desc', fn($q) => $q->orderBy('price', 'desc'))
-              // 'relevancia' é o padrão (mais recentes primeiro se não houver busca específica)
               ->when($this->sort === 'relevancia', fn($q) => $q->orderBy('created_at', 'desc'));
 
 
         $products = $query->paginate(12);
         $categories = Category::all();
-        // $brands = Brand::all(); // Se houver
 
         return view('livewire.catalogo-produtos', [
             'products' => $products,
             'categories' => $categories,
-            // 'todasMarcas' => $brands, // Se houver
         ]);
     }
 }

@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <!-- ... (seu head existente) ... -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'SuppStore') }} @yield('title')</title>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Estilos Globais -->
     <style>
         :root {
             --bs-font-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
@@ -56,7 +51,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- 1. FALTA ISSO: Estilos do Livewire --}}
+    {{-- 1. Estilos do Livewire --}}
     @livewireStyles
 
     @stack('styles')
@@ -64,7 +59,6 @@
 
 <body class="bg-light">
 
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center fs-4" href="{{ url('/') }}">
@@ -82,13 +76,40 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Produtos</a>
                         <ul class="dropdown-menu border-0 shadow">
-                            <li><a class="dropdown-item" href="#">Proteínas</a></li>
-                            <li><a class="dropdown-item" href="#">Pré-Treinos</a></li>
-                            <li><a class="dropdown-item" href="#">Creatinas</a></li>
-                            <li><a class="dropdown-item" href="#">Vitaminas</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item fw-bold" href="{{ route('catalogo') }}">Ver Tudo</a></li>
-                        </ul>
+    
+    {{-- 1. Busca as categorias do banco de dados --}}
+    @php
+        // Usamos o caminho completo da Model para não precisar de 'use' no topo
+        $navbarCategories = \App\Models\Category::all();
+    @endphp
+
+    {{-- 2. Loop para criar um link para cada categoria --}}
+    @foreach($navbarCategories as $cat)
+        <li>
+            {{-- 
+               O segredo está aqui: passamos um array para a rota 'catalogo'.
+               O Laravel transforma isso em ?categoria=ID na URL.
+            --}}
+            <a class="dropdown-item" href="{{ route('catalogo', ['categoria' => $cat->id]) }}">
+                {{ $cat->name }}
+            </a>
+        </li>
+    @endforeach
+
+    {{-- Se não tiver categorias cadastradas, mostra uma mensagem --}}
+    @if($navbarCategories->isEmpty())
+        <li><span class="dropdown-item text-muted small">Sem categorias</span></li>
+    @endif
+
+    <li><hr class="dropdown-divider"></li>
+    
+    {{-- Link para limpar filtros (Ver Tudo) --}}
+    <li>
+        <a class="dropdown-item fw-bold" href="{{ route('catalogo') }}">
+            Ver Tudo
+        </a>
+    </li>
+</ul>
                     </li>
 
                     <li class="nav-item"><a class="nav-link" href="{{ route('sobre') }}">Blog</a></li>
@@ -103,39 +124,21 @@
                     </a>
 
                     {{-- 
-                        BOTÃO DO CARRINHO (AGORA SEMPRE ABRE O OFFCANVAS)
-                        A lógica de bloqueio está dentro do componente cart-bar.
+                        BOTÃO DO CARRINHO (COMPONENTE LIVEWIRE)
+                        Substituímos o código estático por este componente.
+                        Ele ouve o evento 'cart-updated' e atualiza o número sozinho.
                     --}}
-                    <a href="#" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold position-relative"
-                    data-bs-toggle="offcanvas" 
-                    data-bs-target="#cartOffcanvas">
-                        <i class="bi bi-bag-fill"></i>
-                        
-                        {{-- Só mostra a contagem se estiver logado --}}
-                        @if(Auth::guard('client')->check())
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark">
-                                {{ count(session('cart', [])) }}
-                            </span>
-                        @else
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary border border-dark">
-                                <i class="bi bi-lock-fill" style="font-size: 0.6rem;"></i>
-                            </span>
-                        @endif
-                    </a>
-                </div>
-
-
+                    <livewire:cart-icon />
+                    
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Conteúdo -->
     <main>
         @yield('conteudo')
     </main>
 
-    <!-- Footer -->
     <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
         <div class="container text-center text-md-start">
             <div class="row text-center text-md-start">
@@ -182,27 +185,27 @@
         </div>
     </footer>
 
-<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-        {{-- Mantemos modal-xl para ter espaço quando for registrar --}}
+    {{-- MODAL DE LOGIN/REGISTRO --}}
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
-
-            {{-- MUDANÇA: bg-transparent, border-0 e shadow-none tornam o container invisível --}}
             <div class="modal-content bg-transparent border-0 shadow-none">
                 <div class="modal-body p-0">
                     <livewire:auth-modal />
                 </div>
             </div>
-
         </div>
-</div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<livewire:cart-bar />
+    
+    {{-- COMPONENTE DO CARRINHO (BARRA LATERAL) --}}
+    <livewire:cart-bar />
+    
     @livewireScripts
 
    <script>
-
-    function mascaraCPF(i) {
+        // Funções de Máscara (Globais)
+        function mascaraCPF(i) {
             var v = i.value;
             if(v.length > 14) { i.value = v.substring(0, 14); return; }
             v = v.replace(/\D/g, "");
@@ -222,29 +225,31 @@
             i.dispatchEvent(new Event('input'));
         }
 
+        // Listeners do Livewire
+        document.addEventListener('livewire:initialized', () => {
+            
+            // Abre modal de login
+            Livewire.on('open-auth-modal', () => {
+                const el = document.getElementById('quickViewModal');
+                if (el) bootstrap.Modal.getInstance(el)?.hide();
+                const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+                authModal.show();
+            });
 
+            // Fecha modal de produto
+            Livewire.on('close-quick-view', () => {
+                const el = document.getElementById('quickViewModal');
+                if (el) bootstrap.Modal.getInstance(el)?.hide();
+            });
 
-
-    document.addEventListener('livewire:initialized', () => {
-        Livewire.on('open-auth-modal', () => {
-            const el = document.getElementById('quickViewModal');
-            if (el) bootstrap.Modal.getInstance(el)?.hide();
-            const authModal = new bootstrap.Modal(document.getElementById('authModal'));
-            authModal.show();
+            // Abre o carrinho lateral
+            Livewire.on('open-cart', () => {
+                const el = document.getElementById('cartOffcanvas');
+                const offcanvas = new bootstrap.Offcanvas(el);
+                offcanvas.show();
+            });
         });
-
-        Livewire.on('close-quick-view', () => {
-            const el = document.getElementById('quickViewModal');
-            if (el) bootstrap.Modal.getInstance(el)?.hide();
-        });
-
-        Livewire.on('open-cart', () => {
-            const el = document.getElementById('cartOffcanvas');
-            const offcanvas = new bootstrap.Offcanvas(el);
-            offcanvas.show();
-        });
-    });
-</script>
+    </script>
 
     @stack('scripts')
 </body>

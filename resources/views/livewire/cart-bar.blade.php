@@ -78,7 +78,14 @@
                     <div class="text-center my-auto p-4">
                         <i class="bi bi-cart-x display-1 text-muted opacity-25"></i>
                         <h5 class="text-muted fw-bold mt-3">Carrinho vazio</h5>
-                        <button class="btn btn-warning fw-bold mt-2 rounded-pill" data-bs-dismiss="offcanvas">Ver Produtos</button>
+                        
+                        {{-- 
+                            CORREÇÃO: Removido 'data-bs-dismiss="offcanvas"' 
+                            Isso garante que o navegador siga o link para a rota 'catalogo'.
+                        --}}
+                        <a href="{{ route('catalogo') }}" class="btn btn-warning fw-bold mt-2 rounded-pill">
+                            Ver Produtos
+                        </a>
                     </div>
                 @endif
 
