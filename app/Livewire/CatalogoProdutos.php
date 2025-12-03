@@ -4,9 +4,11 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url; // <--- ADICIONADO: Importação necessária
+use Livewire\Attributes\Url;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth; // <--- CORREÇÃO AQUI: Importação correta da Facade Auth
+use App\Models\CartItem; // Adicionado para uso no método addToCart
 
 class CatalogoProdutos extends Component
 {
@@ -14,11 +16,10 @@ class CatalogoProdutos extends Component
 
     // Filtros existentes
     public $search = '';
-    
+
     public $sort = 'relevancia';
 
-    // MUDANÇA AQUI: Adicionamos o atributo #[Url]
-    // Isso faz com que o Livewire leia e escreva na barra de endereço (?categoria=ID)
+    // Atributo #[Url] para sincronizar com a query string ?categoria=ID
     #[Url(as: 'categoria')] 
     public $categoryFilter = null;
 
@@ -53,33 +54,44 @@ class CatalogoProdutos extends Component
     public function addToCart($productId)
     {
         $product = Product::find($productId);
+        if (!$product) return;
 
-        if (!$product) {
-            return;
+        // SE LOGADO: Salva no Banco de Dados
+        if (Auth::guard('client')->check()) {
+            $item = CartItem::where('client_id', Auth::guard('client')->id())
+                        ->where('product_id', $productId)
+                        ->first();
+            
+            if ($item) {
+                $item->increment('quantity');
+            } else {
+                CartItem::create([
+                    'client_id' => Auth::guard('client')->id(),
+                    'product_id' => $productId,
+                    'quantity' => 1
+                ]);
+            }
+        } 
+        // SE VISITANTE: Salva na Sessão
+        else {
+            $cart = session()->get('cart', []);
+            if (isset($cart[$productId])) {
+                $cart[$productId]['quantity']++;
+            } else {
+                $cart[$productId] = [
+                    'name' => $product->name,
+                    'quantity' => 1,
+                    'price' => $product->price,
+                    'image' => $product->image_path
+                ];
+            }
+            session()->put('cart', $cart);
         }
 
-        $cart = session()->get('cart', []);
-
-        // Se o produto já existe no carrinho, aumenta a quantidade
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity']++;
-        } else {
-            // Se não existe, adiciona novo
-            $cart[$productId] = [
-                'name' => $product->name,
-                'quantity' => 1,
-                'price' => $product->price,
-                'image' => $product->image_path
-            ];
-        }
-
-        session()->put('cart', $cart);
-
-        // Dispara evento para o componente do carrinho atualizar e abre o menu lateral
+        // Atualiza os componentes visuais do carrinho
         $this->dispatch('cart-updated'); 
         $this->dispatch('open-cart');
         
-        // Feedback visual (opcional)
         session()->flash('success', 'Produto adicionado!');
     }
 
@@ -112,7 +124,6 @@ class CatalogoProdutos extends Component
         $query->when($this->sort === 'price_asc', fn($q) => $q->orderBy('price', 'asc'))
               ->when($this->sort === 'price_desc', fn($q) => $q->orderBy('price', 'desc'))
               ->when($this->sort === 'relevancia', fn($q) => $q->orderBy('created_at', 'desc'));
-
 
         $products = $query->paginate(12);
         $categories = Category::all();

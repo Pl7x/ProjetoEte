@@ -33,38 +33,50 @@ class ProductQuickView extends Component
 
     public function addToCart()
     {
-        // 1. VERIFICAÇÃO DE LOGIN
-        if (!Auth::guard('client')->check()) {
-            // Fecha o QuickView e abre o Login
-            $this->dispatch('close-quick-view');
-            $this->dispatch('open-auth-modal');
-            return;
+        // 1. Validações
+        $this->updatedQuantity();
+
+        // 2. SE LOGADO: Salva no Banco
+        if (Auth::guard('client')->check()) {
+            $item = \App\Models\CartItem::where('client_id', Auth::guard('client')->id())
+                        ->where('product_id', $this->product->id)
+                        ->first();
+            
+            if ($item) {
+                $item->quantity += $this->quantity;
+                $item->save();
+            } else {
+                \App\Models\CartItem::create([
+                    'client_id' => Auth::guard('client')->id(),
+                    'product_id' => $this->product->id,
+                    'quantity' => $this->quantity
+                ]);
+            }
+        } 
+        // 3. SE VISITANTE: Salva na Sessão (Mas o botão QuickView atual
+        //    pode bloquear isso se você manteve o bloqueio. 
+        //    Se você tirou o bloqueio para permitir adicionar como visitante, use isto:)
+        else {
+            $cart = session()->get('cart', []);
+            $id = $this->product->id;
+
+            if (isset($cart[$id])) {
+                $cart[$id]['quantity'] += $this->quantity;
+            } else {
+                $cart[$id] = [
+                    'name' => $this->product->name,
+                    'price' => $this->product->price,
+                    'quantity' => $this->quantity,
+                    'image' => $this->product->image_path
+                ];
+            }
+            session()->put('cart', $cart);
         }
 
-        // 2. ADICIONAR AO CARRINHO
-        $this->updatedQuantity(); // Garante que o número está certo
-        
-        $cart = session()->get('cart', []);
-        $id = $this->product->id;
-
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] += $this->quantity;
-        } else {
-            $cart[$id] = [
-                'name' => $this->product->name,
-                'price' => $this->product->price,
-                'quantity' => $this->quantity,
-                'image' => $this->product->image_path
-            ];
-        }
-
-        session()->put('cart', $cart);
-
-        // 3. FEEDBACK
+        // 4. Feedback
         $this->dispatch('cart-updated');
         $this->dispatch('close-quick-view');
-        $this->dispatch('open-cart'); // Abre o carrinho lateral
-        
+        $this->dispatch('open-cart');
         
         $this->quantity = 1;
     }

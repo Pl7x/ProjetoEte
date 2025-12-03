@@ -2,26 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable; // Importante!
+// ATENÇÃO: Não use 'Illuminate\Database\Eloquent\Model'
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Client extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use Notifiable;
 
-    protected $guard = 'client'; // Define que usa o guard 'client'
-
+    // Campos que podem ser preenchidos
     protected $fillable = [
-    'name', 'email', 'phone', 'cpf', 'password', // <--- Adicionado 'phone'
-    'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado'
-];
+        'name',
+        'email',
+        'phone',
+        'cpf',
+        'password',
+        'cep',
+        'endereco',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
+    ];
 
+    // Campos escondidos (segurança)
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-    ];
+    // Garante que a senha seja tratada corretamente
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 }
