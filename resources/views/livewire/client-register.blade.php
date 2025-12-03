@@ -24,6 +24,20 @@
                     <input type="email" wire:model="email" class="form-control form-control-lg fs-6 bg-light border-0">
                     @error('email') <span class="text-danger small">{{ $message }}</span> @enderror
                 </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-secondary small">Celular</label>
+                    <input type="text" 
+                        wire:model="phone" 
+                        class="form-control form-control-lg fs-6 bg-light border-0" 
+                        placeholder="(00) 00000-0000"
+                        maxlength="15"
+                        oninput="mascaraTelefone(this)">
+                    @error('phone') <span class="text-danger small">{{ $message }}</span> @enderror
+                </div>
+
+
+
 
                 <div class="mb-3">
                     <label class="form-label fw-bold text-secondary small">CPF</label>

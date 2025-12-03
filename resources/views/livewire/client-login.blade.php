@@ -76,7 +76,9 @@
                     <input class="form-check-input border-secondary" type="checkbox" id="remember" wire:model="remember" style="cursor: pointer;">
                     <label class="form-check-label small text-secondary cursor-pointer" for="remember">Lembrar</label>
                 </div>
-                <a href="#" class="small text-decoration-none fw-bold text-warning hover-opacity-75">Esqueceu a senha?</a>
+                <a href="{{ route('client.password.request') }}" class="small text-decoration-none fw-bold text-warning hover-opacity-75">
+                     Esqueceu a senha?
+                </a>
             </div>
 
             <div class="d-grid mb-4">

@@ -104,6 +104,14 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // ADICIONADO: CONFIGURAÇÃO DE RESET DE SENHA PARA CLIENTES
+        'clients' => [
+            'provider' => 'clients', // Usa o provider 'clients' definido acima
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
     ],
 
     /*

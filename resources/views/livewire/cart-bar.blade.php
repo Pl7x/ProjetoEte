@@ -16,7 +16,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                             <span class="small text-muted fw-bold">Selecione para comprar</span>
                             <span class="badge bg-secondary">{{ count($selectedItems) }} selecionados</span>
-                            
+
                         </div>
 
                         @foreach($cart as $id => $item)
@@ -27,7 +27,7 @@
                                             <input class="form-check-input border-secondary" 
                                                    type="checkbox" 
                                                    value="{{ $id }}" 
-                                                   wire:model.live="selectedItems"
+                                               Q    wire:model.live="selectedItems"
                                                    style="transform: scale(1.3); cursor: pointer;">
                                         </div>
                                     </div>

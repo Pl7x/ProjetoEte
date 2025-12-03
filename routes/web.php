@@ -6,6 +6,8 @@ use App\Http\Controllers\CatalogoController; // Importação do Catálogo
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
+use App\Livewire\ClientForgotPassword;
+use App\Livewire\ClientResetPassword;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,12 +39,15 @@ Route::get('/politicas', function () {
     return view('politicas');
 })->name('politicas');
 
+Route::middleware('guest:client')->group(function () {
+    
+    Route::get('/cliente/recuperar-senha', \App\Livewire\ClientForgotPassword::class)->name('client.password.request');
+    
+    Route::get('/cliente/redefinir-senha/{token}', \App\Livewire\ClientResetPassword::class)->name('password.reset');
 
-/*
-|--------------------------------------------------------------------------
-| Rotas Protegidas (Painel Admin)
-|--------------------------------------------------------------------------
-*/
+});
+
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/painel', function () {

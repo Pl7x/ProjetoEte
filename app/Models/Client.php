@@ -13,9 +13,9 @@ class Client extends Authenticatable
     protected $guard = 'client'; // Define que usa o guard 'client'
 
     protected $fillable = [
-        'name', 'email', 'cpf', 'password',
-        'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado'
-    ];
+    'name', 'email', 'phone', 'cpf', 'password', // <--- Adicionado 'phone'
+    'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado'
+];
 
     protected $hidden = [
         'password', 'remember_token',

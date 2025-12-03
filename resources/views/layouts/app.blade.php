@@ -99,7 +99,7 @@
     {{-- Se não tiver categorias cadastradas, mostra uma mensagem --}}
     @if($navbarCategories->isEmpty())
         <li><span class="dropdown-item text-muted small">Sem categorias</span></li>
-        
+
     @endif
 
     <li><hr class="dropdown-divider"></li>
@@ -138,6 +138,8 @@
 
     <main>
         @yield('conteudo')
+
+        {{ $slot ?? '' }}
     </main>
 
     <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
@@ -205,6 +207,18 @@
     @livewireScripts
 
    <script>
+
+
+        function mascaraTelefone(i) {
+            var v = i.value;
+            v = v.replace(/\D/g, ""); // Remove tudo o que não é dígito
+            v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); // Coloca parênteses em volta dos dois primeiros dígitos
+            v = v.replace(/(\d)(\d{4})$/, "$1-$2");    // Coloca hífen entre o quarto e o quinto dígitos
+            i.value = v;
+            i.dispatchEvent(new Event('input'));
+        }
+
+
         // Funções de Máscara (Globais)
         function mascaraCPF(i) {
             var v = i.value;

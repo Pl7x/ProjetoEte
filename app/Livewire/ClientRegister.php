@@ -26,46 +26,50 @@ class ClientRegister extends Component
     // Removemos as regras daqui para usá-las diretamente no método register,
     // pois precisamos limpar os dados (remover máscaras) ANTES de validar.
 
-    public function register()
-    {
-        // 1. LIMPEZA: Remove tudo que não for número do CPF e CEP
-        $this->cpf = preg_replace('/[^0-9]/', '', $this->cpf);
-        $this->cep = preg_replace('/[^0-9]/', '', $this->cep);
+    // Adicione a propriedade pública
+public $phone; 
 
-        // 2. VALIDAÇÃO: Agora validamos os dados "limpos"
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:clients,email',
-            'cpf'   => 'required|string|digits:11', // Exige exatamente 11 números
-            'password' => 'required|min:6|confirmed',
-            'cep' => 'required|string|digits:8',    // Exige exatamente 8 números
-            'endereco' => 'required|string',
-            'numero' => 'required|string',
-            'bairro' => 'required|string',
-            'cidade' => 'required|string',
-            'estado' => 'required|string|max:2',
-        ]);
+public function register()
+{
+    // 1. LIMPEZA (CPF, CEP e agora TELEFONE)
+    $this->cpf = preg_replace('/[^0-9]/', '', $this->cpf);
+    $this->cep = preg_replace('/[^0-9]/', '', $this->cep);
+    $this->phone = preg_replace('/[^0-9]/', '', $this->phone); // <--- Limpa o telefone
 
-        // 3. CRIAÇÃO DO CLIENTE
-        $client = Client::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'cpf' => $this->cpf, // Salva apenas números (ideal para BD)
-            'password' => Hash::make($this->password),
-            'cep' => $this->cep, // Salva apenas números
-            'endereco' => $this->endereco,
-            'numero' => $this->numero,
-            'complemento' => $this->complemento,
-            'bairro' => $this->bairro,
-            'cidade' => $this->cidade,
-            'estado' => $this->estado,
-        ]);
+    // 2. VALIDAÇÃO
+    $this->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:clients,email',
+        'cpf'   => 'required|string|digits:11',
+        'phone' => 'required|string|min:10|max:11', // <--- Valida celular ou fixo
+        'password' => 'required|min:6|confirmed',
+        'cep' => 'required|string|digits:8',
+        'endereco' => 'required|string',
+        'numero' => 'required|string',
+        'bairro' => 'required|string',
+        'cidade' => 'required|string',
+        'estado' => 'required|string|max:2',
+    ]);
 
-        // 4. LOGIN E REDIRECIONAMENTO
-        Auth::guard('client')->login($client);
+    // 3. CRIAÇÃO
+    $client = Client::create([
+        'name' => $this->name,
+        'email' => $this->email,
+        'phone' => $this->phone, // <--- Salva o telefone
+        'cpf' => $this->cpf,
+        'password' => Hash::make($this->password),
+        'cep' => $this->cep,
+        'endereco' => $this->endereco,
+        'numero' => $this->numero,
+        'complemento' => $this->complemento,
+        'bairro' => $this->bairro,
+        'cidade' => $this->cidade,
+        'estado' => $this->estado,
+    ]);
 
-        return redirect(request()->header('Referer'));
-    }
+    Auth::guard('client')->login($client);
+    return redirect(request()->header('Referer'));
+}
 
     public function render()
     {
