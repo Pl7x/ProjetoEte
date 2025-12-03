@@ -88,6 +88,7 @@ class CartBar extends Component
         session()->put('cart', $this->cart);
         $this->calculateTotal();
         $this->dispatch('cart-updated');
+        
     }
 
     public function render()

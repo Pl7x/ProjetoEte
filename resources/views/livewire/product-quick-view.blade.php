@@ -129,7 +129,7 @@
     @else
         <div class="modal-body py-5 text-center">
              <div class="spinner-border text-warning mb-3" role="status"></div>
-             <p class="fw-bold text-muted">Carregando produto...</p>
+             <p class="fw-bold text-muted">Carregando o produto...</p>
         </div>
     @endif
 

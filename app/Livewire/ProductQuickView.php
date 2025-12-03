@@ -65,6 +65,7 @@ class ProductQuickView extends Component
         $this->dispatch('close-quick-view');
         $this->dispatch('open-cart'); // Abre o carrinho lateral
         
+        
         $this->quantity = 1;
     }
 

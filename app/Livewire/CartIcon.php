@@ -21,6 +21,7 @@ class CartIcon extends Component
     {
         // Atualiza a propriedade lendo a sessão
         $this->count = count(session('cart', []));
+        
     }
 
     public function render()

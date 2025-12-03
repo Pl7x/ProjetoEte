@@ -14,6 +14,7 @@ class CatalogoProdutos extends Component
 
     // Filtros existentes
     public $search = '';
+    
     public $sort = 'relevancia';
 
     // MUDANÇA AQUI: Adicionamos o atributo #[Url]

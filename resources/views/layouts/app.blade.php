@@ -99,6 +99,7 @@
     {{-- Se não tiver categorias cadastradas, mostra uma mensagem --}}
     @if($navbarCategories->isEmpty())
         <li><span class="dropdown-item text-muted small">Sem categorias</span></li>
+        
     @endif
 
     <li><hr class="dropdown-divider"></li>

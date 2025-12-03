@@ -14,6 +14,7 @@
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark">
                 {{ $count }}
             </span>
+            
         </a>
     @else
         <a href="#" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold position-relative"
