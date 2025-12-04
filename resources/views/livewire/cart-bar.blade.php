@@ -14,7 +14,7 @@
                 @if(count($cart) > 0)
                     <div class="flex-grow-1 overflow-auto p-3">
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                            <span class="small text-muted fw-bold">Selecione para comprar</span>
+                            <span class="small text-muted fw-bold">Selecione para dsdacomprar</span>
                             <span class="badge bg-secondary">{{ count($selectedItems) }} selecionados</span>
 
                         </div>
