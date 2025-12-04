@@ -113,15 +113,6 @@
           </a>
         </li>
 
-        <li class="sidebar-heading">Configurações</li>
-
-        <li class="nav-item">
-          <a href="#" class="nav-link {{request()->routeIs('#') ? 'active' : ''}}">
-            <i class="bi bi-gear-fill me-2"></i>
-            Geral
-          </a>
-        </li>
-
       </ul>
 
       <hr>

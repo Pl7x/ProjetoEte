@@ -76,16 +76,41 @@
     </section>
 
      {{-- 3. Trust Bar (Marcas) --}}
-     <div class="py-5">
+    <div class="py-5">
         <div class="container">
             <p class="text-center text-muted small text-uppercase fw-bold mb-4 tracking-widest">Parceiros Oficiais e Certificações</p>
             <div class="row row-cols-3 row-cols-md-6 g-4 justify-content-center align-items-center opacity-25 grayscale-hover transition-all">
-                {{-- Logos Placeholder (Use imagens reais aqui) --}}
-                @for($i=0; $i<6; $i++)
+
+                {{-- Logo 1 --}}
                 <div class="col text-center">
-                     <img src="https://placehold.co/120x50/e9ecef/adb5bd?text=LOGO+{{$i+1}}" alt="Parceiro" class="img-fluid mix-blend-multiply">
+                     <img src="{{ asset('img/Logo_Spotter.jpg') }}" alt="Parceiro 1" class="img-fluid mix-blend-multiply">
                 </div>
-                @endfor
+
+                {{-- Logo 2 --}}
+                <div class="col text-center">
+                     <img src="{{ asset('img/Logo_Nexo.png') }}" alt="Parceiro 2" class="img-fluid mix-blend-multiply">
+                </div>
+
+                {{-- Logo 3 --}}
+                <div class="col text-center">
+                     <img src="{{ asset('img/logo3.jpg') }}" alt="Parceiro 3" class="img-fluid mix-blend-multiply">
+                </div>
+
+                {{-- Logo 4 --}}
+                <div class="col text-center">
+                     <img src="{{ asset('img/logo4.jpg') }}" alt="Parceiro 4" class="img-fluid mix-blend-multiply">
+                </div>
+
+                {{-- Logo 5 --}}
+                <div class="col text-center">
+                     <img src="{{ asset('img/logo5.jpg') }}" alt="Parceiro 5" class="img-fluid mix-blend-multiply">
+                </div>
+
+                {{-- Logo 6 --}}
+                <div class="col text-center">
+                     <img src="{{ asset('img/logo6.jpg') }}" alt="Parceiro 6" class="img-fluid mix-blend-multiply">
+                </div>
+
             </div>
         </div>
     </div>
@@ -116,7 +141,7 @@
                             </div>
                         </li>
                     </ul>
-                    
+
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2">
                     {{-- Container principal, agora com flex-column para empilhar os elementos --}}
@@ -151,7 +176,7 @@
         </div>
     </section>
 
-    
+
 
     {{-- 7. Prova Social (Mudança para fundo escuro para contraste) --}}
     <section class="py-5 bg-dark text-white overflow-hidden position-relative">
@@ -191,7 +216,7 @@
         </div>
     </section>
 
-    
+
 
     {{-- WhatsApp Flutuante (Mantido) --}}
     <a href="#" class="position-fixed bottom-0 end-0 m-4 btn btn-success rounded-circle shadow-lg d-flex align-items-center justify-content-center z-3 hover-scale"
