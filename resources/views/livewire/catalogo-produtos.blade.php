@@ -97,22 +97,43 @@
                 @forelse($products as $produto)
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100 border-0 shadow-sm hover-lift overflow-hidden group" wire:key="product-{{ $produto->id }}">
+                            
+                            {{-- ÁREA DA IMAGEM CORRIGIDA --}}
                             <div class="position-relative bg-light p-4 mb-3 rounded-3 d-flex align-items-center justify-content-center" style="height: 250px;">
                                 @if ($produto->image_path)
-                                    <img src="{{ asset('storage/' . $produto->image_path) }}"
-                                         class="img-fluid transition-transform group-hover-scale"
-                                         style="mix-blend-mode: multiply; max-height: 180px;"
-                                         alt="{{ $produto->name }}">
+                                    @if(str_starts_with($produto->image_path, 'http'))
+                                        {{-- URL Externa --}}
+                                        <img src="{{ $produto->image_path }}"
+                                             class="img-fluid transition-transform group-hover-scale"
+                                             style="mix-blend-mode: multiply; max-height: 180px;"
+                                             alt="{{ $produto->name }}">
+                                    @elseif(str_starts_with($produto->image_path, 'img/'))
+                                        {{-- Imagem Estática (public/img) --}}
+                                        <img src="{{ asset($produto->image_path) }}"
+                                             class="img-fluid transition-transform group-hover-scale"
+                                             style="mix-blend-mode: multiply; max-height: 180px;"
+                                             alt="{{ $produto->name }}">
+                                    @else
+                                        {{-- Upload do Sistema (Storage) --}}
+                                        <img src="{{ asset('storage/' . $produto->image_path) }}"
+                                             class="img-fluid transition-transform group-hover-scale"
+                                             style="mix-blend-mode: multiply; max-height: 180px;"
+                                             alt="{{ $produto->name }}">
+                                    @endif
                                 @else
-                                    <img src="https://via.placeholder.com/300x300?text=Sem+Imagem" class="img-fluid transition-transform group-hover-scale" style="mix-blend-mode: multiply; max-height: 180px;" alt="Imagem não disponível">
+                                    {{-- Sem Imagem --}}
+                                    <div class="text-center text-muted opacity-25">
+                                        <i class="bi bi-image display-1"></i>
+                                        <p class="small fw-bold mt-2">Sem Imagem</p>
+                                    </div>
                                 @endif
 
-                                {{-- Botão Comprar (ALTERADO PARA ABRIR A MODAL) --}}
+                                {{-- Botão Comprar (Abre Quick View) --}}
                                 <button wire:click.prevent="openQuickView({{ $produto->id }})"
                                         class="btn btn-dark w-75 position-absolute bottom-0 mb-3 rounded-pill shadow fw-bold opacity-0 group-hover-visible translate-y-100 group-hover-translate-0 transition-all">
                                     <span wire:loading.remove wire:target="openQuickView({{ $produto->id }})">Comprar</span>
                                     <span wire:loading wire:target="openQuickView({{ $produto->id }})">
-                                        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span> Carregando...
+                                        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
                                     </span>
                                 </button>
                             </div>
@@ -145,40 +166,18 @@
         </div>
     </div>
 
-    <div>
-    {{-- Adicione este bloco logo no início da div do componente --}}
-
-    @if (session()->has('success'))
-        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    {{-- ... o resto do seu código de filtros e produtos vem aqui ... --}}
-    <div class="container py-5">
-
-    {{-- --- MODAL QUICK VIEW (ADICIONADA AQUI) --- --}}
+    {{-- MODAL QUICK VIEW --}}
     <div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 shadow-lg">
                 @if($selectedProductId)
-    @livewire('product-quick-view', ['productId' => $selectedProductId], key('quick-view-' . $selectedProductId))
-        @else
-    @endif
+                    @livewire('product-quick-view', ['productId' => $selectedProductId], key('quick-view-' . $selectedProductId))
+                @endif
             </div>
         </div>
     </div>
-    {{-- ------------------------------------------- --}}
 
-    {{-- Estilos Inline (Mantidos) --}}
+    {{-- Estilos Inline --}}
     <style>
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
@@ -192,21 +191,18 @@
         .translate-y-100 { transform: translateY(100%); }
     </style>
 
-    {{-- Script para abrir a modal (Adicionado aqui) --}}
+    {{-- Script para abrir a modal --}}
     <script>
         document.addEventListener('livewire:initialized', () => {
             const modalElement = document.getElementById('quickViewModal');
             const modalInstance = new bootstrap.Modal(modalElement);
 
-            // Ouve o evento disparado pelo componente do catálogo para abrir a modal
             Livewire.on('show-quick-view-modal', () => {
                 modalInstance.show();
             });
 
-            // Opcional: Limpa o ID do produto selecionado quando a modal fecha
-            modalElement.addEventListener('hidden.bs.modal', () => {
-                // Chama um método no componente Livewire para resetar o ID (se necessário)
-                // @this.call('closeQuickView');
+            Livewire.on('close-quick-view', () => {
+                modalInstance.hide();
             });
         });
     </script>

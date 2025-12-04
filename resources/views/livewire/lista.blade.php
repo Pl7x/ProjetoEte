@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    {{-- BARRA DE FILTROS (NOVO) --}}
+    {{-- BARRA DE FILTROS --}}
     <div class="card mb-4 border-0 shadow-sm bg-light">
         <div class="card-body py-3">
             <div class="row g-3">
@@ -17,7 +17,7 @@
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
                         <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar por nome do produto..." 
-                            wire:model.live.debounce.300ms="search"> {{-- debounce evita muitas requisições enquanto digita --}}
+                            wire:model.live.debounce.300ms="search">
                     </div>
                 </div>
 
@@ -58,7 +58,6 @@
                 <i class="fas fa-list me-1 text-primary"></i>
                 Lista de Itens
             </div>
-            {{-- Mostra contador de resultados se estiver filtrando --}}
             @if($search || $category_id)
                 <small class="text-muted fw-normal">
                     Encontrados: {{ $produtos->total() }} produtos
@@ -82,16 +81,26 @@
                         @forelse($produtos as $produto)
                         <tr>
                             <td class="ps-4 py-3">
+                                {{-- LÓGICA DE IMAGEM CORRIGIDA --}}
                                 <div class="rounded border d-flex align-items-center justify-content-center bg-light shadow-sm" style="width: 50px; height: 50px; overflow:hidden;">
                                     @if($produto->image_path)
-                                        @if(Str::startsWith($produto->image_path, 'http'))
+                                        {{-- 1. URL Externa (começa com http) --}}
+                                        @if(str_starts_with($produto->image_path, 'http'))
                                             <img src="{{ $produto->image_path }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
+                                        
+                                        {{-- 2. Imagem Estática (começa com img/ - pasta public) --}}
+                                        @elseif(str_starts_with($produto->image_path, 'img/'))
+                                            <img src="{{ asset($produto->image_path) }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
+                                        
+                                        {{-- 3. Upload do Sistema (Storage padrão) --}}
                                         @else
                                             <img src="{{ asset('storage/' . $produto->image_path) }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
                                         @endif
                                     @else
+                                        {{-- Sem Imagem --}}
                                         <span class="text-muted small"><i class="fas fa-image fa-lg"></i></span>
                                     @endif
+                                    
                                 </div>
                             </td>
                             <td class="fw-bold text-dark">{{ $produto->name }}</td>
@@ -163,7 +172,7 @@
         @endif
     </div>
 
-    {{-- Modal de Exclusão (Mantido igual) --}}
+    {{-- Modal de Exclusão --}}
     <div wire:ignore.self class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
