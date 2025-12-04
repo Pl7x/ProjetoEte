@@ -124,11 +124,6 @@
                         <i class="bi bi-person fs-5"></i>
                     </a>
 
-                    {{-- 
-                        BOTÃO DO CARRINHO (COMPONENTE LIVEWIRE)
-                        Substituímos o código estático por este componente.
-                        Ele ouve o evento 'cart-updated' e atualiza o número sozinho.
-                    --}}
                     <livewire:cart-icon />
                     
                 </div>

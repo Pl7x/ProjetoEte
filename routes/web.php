@@ -8,12 +8,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
 use App\Livewire\ClientForgotPassword;
 use App\Livewire\ClientResetPassword;
+use Illuminate\Http\Request;
 
-/*
-|--------------------------------------------------------------------------
-| Rotas Públicas
-|--------------------------------------------------------------------------
-*/
+Route::get('/checkout/success', function (Request $request) {
+    // Lógica para limpar o carrinho ou registrar o pedido no banco
+    // O Mercado Pago envia parâmetros como ?collection_id=...&status=approved
+    return view('checkout.success'); // Crie essa view ou redirecione
+})->name('checkout.success');
+
+Route::get('/checkout/failure', function () {
+    return redirect()->route('catalogo')->with('error', 'Pagamento falhou ou foi cancelado.');
+})->name('checkout.failure');
+
+Route::get('/checkout/pending', function () {
+    return redirect()->route('catalogo')->with('info', 'Pagamento em processamento.');
+})->name('checkout.pending');
+
+
 
 Route::get('/', function () {
     return view('home');
