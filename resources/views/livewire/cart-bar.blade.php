@@ -27,7 +27,7 @@
                                             <input class="form-check-input border-secondary" 
                                                    type="checkbox" 
                                                    value="{{ $id }}" 
-                                               Q    wire:model.live="selectedItems"
+                                                   wire:model.live="selectedItems"
                                                    style="transform: scale(1.3); cursor: pointer;">
                                         </div>
                                     </div>
@@ -71,10 +71,8 @@
                             <span class="h4 fw-bold text-dark mb-0">R$ {{ number_format($total, 2, ',', '.') }}</span>
                         </div>
                         <div class="d-grid gap-2">
-                            <button wire:click="finalizeOrder" wire:loading.attr="disabled" class="btn btn-dark btn-lg fw-bold" @if($total <= 0) disabled @endif>
-                            <span wire:loading.remove wire:target="finalizeOrder">Finalizar Compra</span>
-                            <span wire:loading wire:target="finalizeOrder">Processando...</span>
-                        </button>
+                            <button class="btn btn-dark btn-lg fw-bold" @if($total <= 0) disabled @endif>Finalizar Compra</button>
+                            <button class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Continuar Comprando</button>
                         </div>
                     </div>
                 @else
