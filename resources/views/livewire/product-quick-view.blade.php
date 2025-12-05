@@ -7,41 +7,58 @@
             $isInvalidQuantity = $quantity < 1;
             $hasNoStock = $product->stock_quantity <= 0;
             $totalPrice = $product->price * (is_numeric($quantity) ? $quantity : 0);
+
+            // --- CORREÇÃO DA IMAGEM ---
+            // Verifica todas as possíveis colunas de imagem para garantir que encontre
+            $rawImage = $product->image_data ?? $product->image ?? $product->image_path ?? null;
+            
+            // Define imagem padrão (fallback)
+            $imageSrc = 'https://via.placeholder.com/400x400?text=Sem+Imagem';
+
+            if ($rawImage) {
+                // 1. Se for Base64 pronto (começa com data:image) ou URL externa (http)
+                if (str_starts_with($rawImage, 'data:image') || str_starts_with($rawImage, 'http')) {
+                    $imageSrc = $rawImage;
+                } 
+                // 2. Se for Base64 sem cabeçalho (tenta decodificar e verifica se não é caminho de arquivo)
+                elseif (base64_decode($rawImage, true) !== false && !preg_match('/[\/\\\\]/', $rawImage)) {
+                    $imageSrc = 'data:image/jpeg;base64,' . $rawImage;
+                }
+                // 3. Caso contrário, assume que é caminho no Storage do Laravel
+                else {
+                    $imageSrc = asset('storage/' . $rawImage);
+                }
+            }
         @endphp
 
         {{-- 
-            BOTÃO DE FECHAR (CORRIGIDO) 
+            BOTÃO DE FECHAR 
             - position-absolute: Fica flutuando sobre o conteúdo
-            - top-0 end-0: Canto superior direito
-            - z-3: Garante que fique ACIMA de tudo (clicável sempre)
+            - z-3: Garante que fique ACIMA de tudo
         --}}
         <button type="button" 
                 class="btn-close position-absolute top-0 end-0 m-4 z-3" 
                 data-bs-dismiss="modal" 
                 aria-label="Close"></button>
         
-        {{-- Adicionei 'mt-3' para dar um respiro no topo por causa do botão --}}
         <div class="modal-body p-4 mt-2">
             <div class="row g-4 align-items-center">
                 
                 {{-- Coluna da Imagem --}}
                 <div class="col-md-6">
                     <div class="bg-light rounded-4 p-3 d-flex justify-content-center align-items-center" style="height: 350px;">
-                        @if ($product->image_path)
-                            <img src="{{ asset('storage/' . $product->image_path) }}"
-                                 class="img-fluid rounded-3 shadow-sm hover-scale transition-transform"
-                                 style="max-height: 300px; object-fit: contain; mix-blend-mode: multiply;"
-                                 alt="{{ $product->name }}">
-                        @else
-                            <img src="https://via.placeholder.com/400x400?text=Sem+Imagem" class="img-fluid rounded-3" alt="Sem imagem">
-                        @endif
+                        {{-- AQUI ESTÁ A CORREÇÃO: Usamos a variável $imageSrc calculada acima --}}
+                        <img src="{{ $imageSrc }}"
+                             class="img-fluid rounded-3 shadow-sm hover-scale transition-transform"
+                             style="max-height: 300px; width: auto; object-fit: contain; mix-blend-mode: multiply;"
+                             alt="{{ $product->name }}">
                     </div>
                 </div>
 
                 {{-- Coluna dos Detalhes --}}
                 <div class="col-md-6">
                     <small class="text-uppercase text-muted fw-bold">{{ $product->category->name ?? 'Geral' }}</small>
-                    <h3 class="fw-bold mb-3 pe-4">{{-- pe-4 para o texto não ficar embaixo do botão fechar em telas menores --}}
+                    <h3 class="fw-bold mb-3 pe-4">
                         {{ $product->name }}
                     </h3>
                     

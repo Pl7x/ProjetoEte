@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\Usercontroller; // Importação corrigida para Admin
 use App\Http\Controllers\CatalogoController; // Importação do Catálogo
+use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
@@ -45,6 +46,11 @@ Route::middleware('guest:client')->group(function () {
     
     Route::get('/cliente/redefinir-senha/{token}', \App\Livewire\ClientResetPassword::class)->name('password.reset');
 
+});
+
+Route::middleware('auth:client')->group(function () {
+Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+    Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
 
