@@ -93,16 +93,28 @@
                         @endforeach
                     </div>
 
-                    <div class="border-top p-3 bg-light mt-auto shadow-lg">
-                        <div class="d-flex justify-content-between mb-3 align-items-center">
-                            <span class="h6 mb-0 text-muted">Total ({{ count($selectedItems) }} itens):</span>
-                            <span class="h4 fw-bold text-dark mb-0">R$ {{ number_format($total, 2, ',', '.') }}</span>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-dark btn-lg fw-bold" @if($total <= 0) disabled @endif>Finalizar Compra</button>
-                            <button class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Continuar Comprando</button>
-                        </div>
-                    </div>
+ <div class="border-top p-3 bg-light mt-auto shadow-lg">
+    <div class="d-flex justify-content-between mb-3 align-items-center">
+        <span class="h6 mb-0 text-muted">Total ({{ count($selectedItems) }} itens):</span>
+        <span class="h4 fw-bold text-dark mb-0">R$ {{ number_format($total, 2, ',', '.') }}</span>
+    </div>
+    
+    <div class="d-grid gap-2">
+        <form action="{{ route('checkout') }}" method="POST" id="checkout-form">
+            @csrf @foreach($selectedItems as $selectedId)
+                <input type="hidden" name="selected_items[]" value="{{ $selectedId }}">
+            @endforeach
+
+            <button type="submit" 
+                    class="btn btn-dark btn-lg fw-bold w-100" 
+                    @if($total <= 0) disabled @endif>
+                Finalizar Compra <i class="bi bi-credit-card-2-front ms-2"></i>
+            </button>
+        </form>
+
+        <button class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Continuar Comprando</button>
+    </div>
+</div>
                 @else
                     <div class="text-center my-auto p-4">
                         <i class="bi bi-cart-x display-1 text-muted opacity-25"></i>

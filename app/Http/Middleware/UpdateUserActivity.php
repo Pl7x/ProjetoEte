@@ -5,20 +5,25 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log; // Importe a facade Log
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+use App\Models\User; // Importante: Importe o Model do Admin
 
 class UpdateUserActivity
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
-        // Verifica se o usuário está logado
         if (Auth::check()) {
-            /** @var \App\Models\User $user */
             $user = Auth::user();
-            // Atualiza a data da última atividade
-            $user->updateLastActivity();
-            Log::info('Última atividade atualizada para o usuário ' . $user->id); // Adicione o log aqui
+
+            // CORREÇÃO: Verifica se o usuário é uma instância de 'User' (Admin)
+            // Assim, ele ignora se for um 'Client'
+            if ($user instanceof User) {
+                
+                // Verifica se o método existe por segurança extra
+                if (method_exists($user, 'updateLastActivity')) {
+                    $user->updateLastActivity();
+                }
+            }
         }
 
         return $next($request);
