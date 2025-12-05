@@ -81,26 +81,15 @@
                         @forelse($produtos as $produto)
                         <tr>
                             <td class="ps-4 py-3">
-                                {{-- LÓGICA DE IMAGEM CORRIGIDA --}}
+                                {{-- LÓGICA DE IMAGEM ATUALIZADA (Base64) --}}
                                 <div class="rounded border d-flex align-items-center justify-content-center bg-light shadow-sm" style="width: 50px; height: 50px; overflow:hidden;">
-                                    @if($produto->image_path)
-                                        {{-- 1. URL Externa (começa com http) --}}
-                                        @if(str_starts_with($produto->image_path, 'http'))
-                                            <img src="{{ $produto->image_path }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
-                                        
-                                        {{-- 2. Imagem Estática (começa com img/ - pasta public) --}}
-                                        @elseif(str_starts_with($produto->image_path, 'img/'))
-                                            <img src="{{ asset($produto->image_path) }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
-                                        
-                                        {{-- 3. Upload do Sistema (Storage padrão) --}}
-                                        @else
-                                            <img src="{{ asset('storage/' . $produto->image_path) }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
-                                        @endif
+                                    @if($produto->image_data)
+                                        {{-- Exibe a imagem salva no banco (funciona para Base64 e URLs antigas) --}}
+                                        <img src="{{ $produto->image_data }}" alt="{{ $produto->name }}" class="w-100 h-100 object-fit-cover">
                                     @else
                                         {{-- Sem Imagem --}}
                                         <span class="text-muted small"><i class="fas fa-image fa-lg"></i></span>
                                     @endif
-                                    
                                 </div>
                             </td>
                             <td class="fw-bold text-dark">{{ $produto->name }}</td>

@@ -14,12 +14,40 @@
                 @if(count($cart) > 0)
                     <div class="flex-grow-1 overflow-auto p-3">
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                            <span class="small text-muted fw-bold">Selecione para dsdacomprar</span>
+                            {{-- CORREÇÃO: Texto corrigido --}}
+                            <span class="small text-muted fw-bold">Selecione para comprar</span>
                             <span class="badge bg-secondary">{{ count($selectedItems) }} selecionados</span>
-
                         </div>
 
                         @foreach($cart as $id => $item)
+                            @php
+                                // 1. Tenta pegar a imagem do array principal ou dos atributos
+                                // Como mudou o nome no banco para 'image_data', verificamos esse nome também
+                                $rawImage = $item['image_data'] 
+                                            ?? $item['attributes']['image_data'] 
+                                            ?? $item['image'] 
+                                            ?? $item['attributes']['image'] 
+                                            ?? null;
+
+                                // 2. Lógica inteligente para Base64
+                                $imageSrc = 'https://via.placeholder.com/60?text=Sem+Img'; // Padrão
+
+                                if ($rawImage) {
+                                    // Se o texto já começar com "data:image", é um Base64 pronto
+                                    if (str_starts_with($rawImage, 'data:image')) {
+                                        $imageSrc = $rawImage;
+                                    } 
+                                    // Se for Base64 puro sem cabeçalho, adicionamos o cabeçalho
+                                    elseif (base64_decode($rawImage, true) !== false) {
+                                        $imageSrc = 'data:image/jpeg;base64,' . $rawImage;
+                                    }
+                                    // Se não for base64, assume que é caminho antigo (retrocompatibilidade)
+                                    else {
+                                        $imageSrc = asset('storage/' . $rawImage);
+                                    }
+                                }
+                            @endphp
+
                             <div class="card mb-3 border-0 shadow-sm {{ in_array($id, $selectedItems) ? 'border-start border-4 border-warning' : 'opacity-75' }}">
                                 <div class="row g-0 align-items-center">
                                     <div class="col-1 d-flex justify-content-center">
@@ -32,11 +60,11 @@
                                         </div>
                                     </div>
                                     <div class="col-3 p-2">
-                                        @if($item['image'])
-                                            <img src="{{ asset('storage/' . $item['image']) }}" class="img-fluid rounded" style="object-fit: contain; height: 60px; width: 100%;">
-                                        @else
-                                            <img src="https://via.placeholder.com/60" class="img-fluid rounded">
-                                        @endif
+                                        {{-- Exibe a imagem processada --}}
+                                        <img src="{{ $imageSrc }}" 
+                                             class="img-fluid rounded" 
+                                             style="object-fit: contain; height: 60px; width: 100%;"
+                                             alt="{{ $item['name'] }}">
                                     </div>
                                     <div class="col-8">
                                         <div class="card-body p-2">
@@ -80,10 +108,6 @@
                         <i class="bi bi-cart-x display-1 text-muted opacity-25"></i>
                         <h5 class="text-muted fw-bold mt-3">Carrinho vazio</h5>
                         
-                        {{-- 
-                            CORREÇÃO: Removido 'data-bs-dismiss="offcanvas"' 
-                            Isso garante que o navegador siga o link para a rota 'catalogo'.
-                        --}}
                         <a href="{{ route('catalogo') }}" class="btn btn-warning fw-bold mt-2 rounded-pill">
                             Ver Produtos
                         </a>

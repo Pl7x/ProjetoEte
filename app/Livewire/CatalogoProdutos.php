@@ -7,8 +7,8 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Support\Facades\Auth; // <--- CORREÇÃO AQUI: Importação correta da Facade Auth
-use App\Models\CartItem; // Adicionado para uso no método addToCart
+use Illuminate\Support\Facades\Auth; 
+use App\Models\CartItem; 
 
 class CatalogoProdutos extends Component
 {
@@ -82,7 +82,8 @@ class CatalogoProdutos extends Component
                     'name' => $product->name,
                     'quantity' => 1,
                     'price' => $product->price,
-                    'image' => $product->image_path
+                    // CORREÇÃO: Usar image_data (Base64) em vez de image_path
+                    'image' => $product->image_data 
                 ];
             }
             session()->put('cart', $cart);

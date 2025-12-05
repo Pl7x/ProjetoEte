@@ -88,19 +88,20 @@
                 </div>
             </div>
 
-            {{-- Coluna Lateral (Imagem) --}}
+{{-- ... TRECHO DA COLUNA DE IMAGEM ... --}}
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white py-3 d-flex align-items-center border-bottom-0">
+                    <div class="card-header bg-white py-3">
                          <h5 class="m-0 fw-bold text-primary"><i class="bi bi-image me-2"></i>Mídia</h5>
                     </div>
                     <div class="card-body p-4 text-center">
                         <div class="mb-4 position-relative">
-                            {{-- Lógica de Preview: Nova Imagem > Imagem Existente > Placeholder --}}
                             @if ($image) 
+                                {{-- Preview do upload temporário --}}
                                 <img src="{{ $image->temporaryUrl() }}" class="img-fluid rounded-3 shadow-sm" style="max-height: 250px;">
-                            @elseif($existing_image)
-                                <img src="{{ asset('storage/' . $existing_image) }}" class="img-fluid rounded-3 shadow-sm" style="max-height: 250px;">
+                            @elseif($existing_image_data)
+                                {{-- Exibe a imagem salva no banco (Base64) --}}
+                                <img src="{{ $existing_image_data }}" class="img-fluid rounded-3 shadow-sm" style="max-height: 250px;">
                             @else
                                 <div class="d-flex align-items-center justify-content-center rounded-3 bg-light text-secondary fw-bold" style="height: 250px; border: 2px dashed #dee2e6;">
                                     <div class="text-center">
@@ -113,7 +114,7 @@
 
                         <div class="mb-3">
                             <label for="image" class="btn btn-outline-primary w-100 cursor-pointer">
-                                <i class="bi bi-cloud-arrow-up me-2"></i> {{ $image || $existing_image ? 'Alterar Imagem' : 'Selecionar Imagem' }}
+                                <i class="bi bi-cloud-arrow-up me-2"></i> {{ $image || $existing_image_data ? 'Alterar Imagem' : 'Selecionar Imagem' }}
                             </label>
                             <input type="file" class="d-none" id="image" wire:model="image" accept="image/*">
                             @error('image') <div class="text-danger small mt-2">{{ $message }}</div> @enderror
@@ -121,6 +122,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </form>
 </div>

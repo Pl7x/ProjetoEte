@@ -9,16 +9,13 @@ class Product extends Model
 {
     use HasFactory;
 
-    // Não precisa mais de $table = 'produtos';
-
-    // Atualizado para os nomes em inglês das colunas
     protected $fillable = [
         'category_id',
         'name',
         'slug',
         'description',
         'price',
-        'image_path',
+        'image_data', // Alterado de image_path para image_data
         'stock_quantity',
         'is_active',
         'is_featured',
@@ -26,7 +23,6 @@ class Product extends Model
 
     public function category()
     {
-        // Não precisa mais explicar as chaves. O padrão funciona.
         return $this->belongsTo(Category::class);
     }
 }

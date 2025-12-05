@@ -30,8 +30,8 @@ class CartBar extends Component
         // SE LOGADO: Lê do Banco
         if (Auth::guard('client')->check()) {
             $dbItems = CartItem::where('client_id', Auth::guard('client')->id())
-                                ->with('product')
-                                ->get();
+                            ->with('product')
+                            ->get();
             
             $this->cart = [];
             foreach ($dbItems as $item) {
@@ -39,7 +39,12 @@ class CartBar extends Component
                     'name' => $item->product->name,
                     'price' => $item->product->price,
                     'quantity' => $item->quantity,
-                    'image' => $item->product->image_path
+                    
+                    // CORREÇÃO AQUI:
+                    // Usamos a coluna 'image_data' (Base64) que está no seu banco.
+                    // Mapeamos para duas chaves para garantir que o Blade encontre.
+                    'image_data' => $item->product->image_data, 
+                    'image'      => $item->product->image_data 
                 ];
             }
         } 

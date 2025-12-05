@@ -98,28 +98,14 @@
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100 border-0 shadow-sm hover-lift overflow-hidden group" wire:key="product-{{ $produto->id }}">
                             
-                            {{-- ÁREA DA IMAGEM CORRIGIDA --}}
+                            {{-- ÁREA DA IMAGEM ATUALIZADA (Base64) --}}
                             <div class="position-relative bg-light p-4 mb-3 rounded-3 d-flex align-items-center justify-content-center" style="height: 250px;">
-                                @if ($produto->image_path)
-                                    @if(str_starts_with($produto->image_path, 'http'))
-                                        {{-- URL Externa --}}
-                                        <img src="{{ $produto->image_path }}"
-                                             class="img-fluid transition-transform group-hover-scale"
-                                             style="mix-blend-mode: multiply; max-height: 180px;"
-                                             alt="{{ $produto->name }}">
-                                    @elseif(str_starts_with($produto->image_path, 'img/'))
-                                        {{-- Imagem Estática (public/img) --}}
-                                        <img src="{{ asset($produto->image_path) }}"
-                                             class="img-fluid transition-transform group-hover-scale"
-                                             style="mix-blend-mode: multiply; max-height: 180px;"
-                                             alt="{{ $produto->name }}">
-                                    @else
-                                        {{-- Upload do Sistema (Storage) --}}
-                                        <img src="{{ asset('storage/' . $produto->image_path) }}"
-                                             class="img-fluid transition-transform group-hover-scale"
-                                             style="mix-blend-mode: multiply; max-height: 180px;"
-                                             alt="{{ $produto->name }}">
-                                    @endif
+                                @if ($produto->image_data)
+                                    {{-- Exibe a imagem salva no banco em Base64 --}}
+                                    <img src="{{ $produto->image_data }}"
+                                         class="img-fluid transition-transform group-hover-scale"
+                                         style="mix-blend-mode: multiply; max-height: 180px;"
+                                         alt="{{ $produto->name }}">
                                 @else
                                     {{-- Sem Imagem --}}
                                     <div class="text-center text-muted opacity-25">
