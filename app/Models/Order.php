@@ -21,7 +21,7 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-<<<<<<< HEAD
+
     public function getStatusFormatadoAttribute()
 {
     return match($this->status) {
@@ -32,8 +32,7 @@ class Order extends Model
     };
 }
 
-=======
->>>>>>> 9ca61fad7a25029d02a8f40f729922ae6cad8f69
+
     // Relação: Um pedido pertence a um cliente (opcional)
     public function client()
     {

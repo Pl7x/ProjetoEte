@@ -31,9 +31,6 @@ class CheckoutController extends Controller
 
         // LÓGICA DE SELEÇÃO: 
         // Se o formulário enviou itens específicos (checkboxes), filtramos por eles.
-<<<<<<< HEAD
-        if ($request->has('selected_items') && is_array($request->selected_items)) {
-=======
         // Caso contrário, pega tudo (comportamento padrão).
         if ($request->has('selected_items') && is_array($request->selected_items)) {
             // O frontend envia os IDs dos itens do carrinho (CartItem ID) ou Produtos.
@@ -43,7 +40,6 @@ class CheckoutController extends Controller
             // Baseado no código anterior do livewire, geralmente é o ID do produto ($id da iteração).
             
             // Vamos filtrar pelo product_id para garantir
->>>>>>> 9ca61fad7a25029d02a8f40f729922ae6cad8f69
              $query->whereIn('product_id', $request->selected_items);
         }
 
@@ -64,15 +60,10 @@ class CheckoutController extends Controller
                     'currency' => 'brl',
                     'product_data' => [
                         'name' => $item->product->name,
-<<<<<<< HEAD
-                    ],
-                    'unit_amount' => intval($item->product->price * 100), // Stripe usa centavos
-=======
                         // Você pode adicionar imagens aqui se quiser:
                         // 'images' => [$item->product->image_url], 
                     ],
                     'unit_amount' => intval($item->product->price * 100), // Stripe usa centavos (R$ 10,00 = 1000)
->>>>>>> 9ca61fad7a25029d02a8f40f729922ae6cad8f69
                 ],
                 'quantity' => $item->quantity,
             ];
@@ -112,26 +103,6 @@ class CheckoutController extends Controller
 
             // Verifica se já salvamos esse pedido antes (para evitar duplicidade no F5)
             if (Order::where('stripe_session_id', $sessionId)->exists()) {
-<<<<<<< HEAD
-                // ATUALIZADO: Redireciona para home se já existe
-                return redirect()->route('home')->with('info', 'Pedido já processado anteriormente.');
-            }
-
-            if ($session->payment_status === 'Pago') {
-                DB::beginTransaction(); // Protege o banco de dados
-
-                // A. Cria o Pedido
-                $order = Order::create([
-                    'stripe_session_id' => $sessionId,
-                    'client_id' => Auth::guard('client')->id(),
-                    'status' => 'Pago', // ou 'concluido'
-                    'total_price' => $session->amount_total / 100,
-                    'customer_name' => $session->customer_details->name,
-                    'customer_email' => $session->customer_details->email,
-                ]);
-
-                // B. Recupera itens do carrinho para salvar no pedido
-=======
                 return view('checkout.success');
             }
 
@@ -163,7 +134,6 @@ class CheckoutController extends Controller
                 // O ideal é limpar apenas os itens comprados ou limpar tudo. 
                 // Vamos limpar tudo para simplificar conforme seu código original.
                 
->>>>>>> 9ca61fad7a25029d02a8f40f729922ae6cad8f69
                 $cartItems = CartItem::where('client_id', Auth::guard('client')->id())->get();
 
                 foreach ($cartItems as $item) {
@@ -187,12 +157,7 @@ class CheckoutController extends Controller
 
                 DB::commit(); // Salva tudo
                 
-<<<<<<< HEAD
-                // ATUALIZADO: Redireciona para a Home com mensagem de sucesso
-                return redirect()->route('home')->with('success', 'Pagamento confirmado! Seu pedido foi realizado com sucesso.');
-=======
                 return view('checkout.success', compact('order'));
->>>>>>> 9ca61fad7a25029d02a8f40f729922ae6cad8f69
             }
 
         } catch (\Exception $e) {
