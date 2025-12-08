@@ -1,6 +1,6 @@
 <div class="container-fluid px-2">
     
-    {{-- CABEÇALHO E AÇÕES RÁPIDAS --}}
+    {{-- 1. CABEÇALHO --}}
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
         <div>
             <h3 class="fw-bold text-dark mb-0">Visão Geral</h3>
@@ -16,9 +16,8 @@
         </div>
     </div>
 
-    {{-- CARDS DE STATUS (KPIs) --}}
+    {{-- 2. CARDS DE STATUS (KPIs) --}}
     <div class="row g-4 mb-4">
-        
         {{-- Card: Faturamento --}}
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
@@ -34,16 +33,16 @@
             </div>
         </div>
 
-        {{-- Card: Pendentes (Com alerta visual se > 0) --}}
+        {{-- Card: A Enviar --}}
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden {{ $pendingOrders > 0 ? 'border-start border-warning border-5' : '' }}">
                 <div class="card-body p-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="text-uppercase fw-bold text-muted small mb-1">Pedidos Pendentes</p>
+                        <p class="text-uppercase fw-bold text-muted small mb-1">Aguardando Envio</p>
                         <h3 class="fw-bold text-dark mb-0">{{ $pendingOrders }}</h3>
                     </div>
                     <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                        <i class="bi bi-exclamation-lg fs-4"></i>
+                        <i class="bi bi-box-seam fs-4"></i>
                     </div>
                 </div>
             </div>
@@ -73,16 +72,17 @@
                         <h3 class="fw-bold text-dark mb-0">{{ $totalProducts }}</h3>
                     </div>
                     <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                        <i class="bi bi-box-seam fs-4"></i>
+                        <i class="bi bi-tag fs-4"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- 3. CONTEÚDO PRINCIPAL REORGANIZADO --}}
     <div class="row g-4">
         
-        {{-- COLUNA PRINCIPAL: ÚLTIMOS PEDIDOS --}}
+        {{-- COLUNA DA ESQUERDA (Principal - Tabela) --}}
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
@@ -94,7 +94,7 @@
                     <table class="table align-middle mb-0 table-hover">
                         <thead class="bg-light text-muted small text-uppercase">
                             <tr>
-                                <th class="ps-4">#ID</th>
+                                <th class="ps-4">N. Pedido</th>
                                 <th>Cliente</th>
                                 <th>Data</th>
                                 <th>Total</th>
@@ -148,10 +148,22 @@
             </div>
         </div>
 
-        {{-- COLUNA LATERAL --}}
-        <div class="col-lg-4 d-flex flex-column gap-4">
+        {{-- COLUNA DA DIREITA (Lateral - Gráfico e Estoque) --}}
+        <div class="col-lg-4">
             
-            {{-- ALERTA DE ESTOQUE --}}
+            {{-- Item 1 da Lateral: Gráfico de Status --}}
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                    <h6 class="fw-bold mb-0">Status dos Pedidos</h6>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center position-relative p-4">
+                    <div style="height: 220px; width: 100%;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Item 2 da Lateral: Estoque Baixo --}}
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white border-0 py-3 px-4">
                     <h6 class="fw-bold mb-0 text-danger">
@@ -162,7 +174,6 @@
                     <ul class="list-group list-group-flush">
                         @forelse($lowStockProducts as $prod)
                             <li class="list-group-item px-4 py-3 border-0 d-flex align-items-center">
-                                {{-- Imagem Mini --}}
                                 <div class="rounded border overflow-hidden me-3" style="width: 40px; height: 40px; min-width: 40px;">
                                     @php
                                         $img = $prod->image_data;
@@ -191,31 +202,34 @@
                     <a href="{{ route('produtos') }}" class="small fw-bold text-decoration-none">Gerenciar Estoque</a>
                 </div>
             </div>
-
-            {{-- ÚLTIMOS CLIENTES --}}
-            <div class="card border-0 shadow-sm rounded-4 flex-grow-1">
-                <div class="card-header bg-white border-0 py-3 px-4">
-                    <h6 class="fw-bold mb-0 text-secondary">Novos Clientes</h6>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        @foreach($latestClients as $client)
-                            <li class="list-group-item px-4 py-3 border-0 d-flex align-items-center">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
-                                    <i class="bi bi-person text-secondary"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 small fw-bold text-dark">{{ $client->name }}</h6>
-                                    <small class="text-muted" style="font-size: 0.75rem;">
-                                        Cadastrado em {{ $client->created_at->format('d/m') }}
-                                    </small>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-
         </div>
     </div>
+
+    {{-- 5. SCRIPTS --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+    document.addEventListener('livewire:initialized', () => {
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: @json($statusLabels),
+                datasets: [{
+                    data: @json($statusValues),
+                    backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%', 
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 20 } }
+                }
+            }
+        });
+    });
+    </script>
 </div>
