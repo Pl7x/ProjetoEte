@@ -103,7 +103,7 @@ class CheckoutController extends Controller
 
             // Verifica se já salvamos esse pedido antes (para evitar duplicidade no F5)
             if (Order::where('stripe_session_id', $sessionId)->exists()) {
-                return view('checkout.success');
+                return redirect()->route('home')->with('info', 'O seu pedido já foi processado.');
             }
 
             if ($session->payment_status === 'paid') {
@@ -153,11 +153,12 @@ class CheckoutController extends Controller
                 }
 
                 // C. Limpa o carrinho
-                CartItem::where('client_id', Auth::guard('client')->id())->delete();
+            CartItem::where('client_id', Auth::guard('client')->id())->delete();
 
                 DB::commit(); // Salva tudo
                 
-                return view('checkout.success', compact('order'));
+                // Redireciona para a home com uma mensagem de sucesso
+                return redirect()->route('home')->with('success', 'Pagamento realizado com sucesso! Pedido #' . $order->id);
             }
 
         } catch (\Exception $e) {

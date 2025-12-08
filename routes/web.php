@@ -51,6 +51,7 @@ Route::middleware('guest:client')->group(function () {
 Route::middleware('auth:client')->group(function () {
 Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/meus-pedidos', \App\Livewire\MeusPedidos::class)->name('meus-pedidos');
 });
 
 
@@ -99,6 +100,7 @@ Route::middleware('auth')->group(function () {
         return view('admin.pedidos');
     })->name('pedidos');
 
+    
     Route::get('/relatorio', function () {
         return view('admin.relatorios');
     })->name('relatorio');

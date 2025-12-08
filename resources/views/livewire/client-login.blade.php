@@ -20,7 +20,7 @@
         </div>
 
         <div class="list-group list-group-flush mb-4 rounded-4 shadow-sm bg-white border overflow-hidden">
-            <a href="#" class="list-group-item list-group-item-action px-4 py-3 border-bottom d-flex align-items-center hover-bg-light">
+            <a href="{{ route('meus-pedidos') }}" class="list-group-item list-group-item-action px-4 py-3 border-bottom d-flex align-items-center hover-bg-light">
                 <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3 text-warning">
                     <i class="bi bi-bag-check-fill fs-5"></i>
                 </div>
