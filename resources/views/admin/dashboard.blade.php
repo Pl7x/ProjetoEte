@@ -5,5 +5,5 @@
     <p>Hoje são {{ date('d/m/y') }}</p>
     <hr>
 
-
+@livewire('dashboard')
 @endsection

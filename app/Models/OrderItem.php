@@ -8,10 +8,16 @@ class OrderItem extends Model
 {
     protected $guarded = [];
 
-    // Relação: Um item de pedido pertence a um Produto original
-    // Isso permite que a gente pegue o nome e a foto do produto depois.
+    // Relação: Um item pertence a um Produto
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    // --- ADICIONE ESTA FUNÇÃO QUE FALTAVA ---
+    // Relação: Um item pertence a um Pedido
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }
