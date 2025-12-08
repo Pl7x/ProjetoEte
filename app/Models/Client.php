@@ -39,4 +39,11 @@ class Client extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // --- ADICIONE ESTA FUNÇÃO QUE FALTAVA ---
+    // Relação: Um Cliente tem muitos Pedidos
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }
