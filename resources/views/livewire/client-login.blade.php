@@ -20,7 +20,7 @@
         </div>
 
         <div class="list-group list-group-flush mb-4 rounded-4 shadow-sm bg-white border overflow-hidden">
-            <a href="{{ route('meus-pedidos') }}" class="list-group-item list-group-item-action px-4 py-3 border-bottom d-flex align-items-center hover-bg-light">
+           <a href="#" data-bs-toggle="modal" data-bs-target="#meusPedidosModal" class="list-group-item list-group-item-action px-4 py-3 border-bottom d-flex align-items-center hover-bg-light">
                 <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3 text-warning">
                     <i class="bi bi-bag-check-fill fs-5"></i>
                 </div>
@@ -30,7 +30,7 @@
                 <i class="bi bi-chevron-right text-muted small"></i>
             </a>
             
-            <a href="#" class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-center hover-bg-light">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#clientSettingsModal" class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-center hover-bg-light">
                 <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-3 text-secondary">
                     <i class="bi bi-person-gear fs-5"></i>
                 </div>

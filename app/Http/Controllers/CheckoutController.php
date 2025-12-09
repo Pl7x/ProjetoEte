@@ -18,72 +18,66 @@ class CheckoutController extends Controller
     // 1. INICIAR PAGAMENTO
     public function checkout(Request $request)
     {
-        // Validação básica
-        $userId = Auth::guard('client')->id();
-        if (!$userId) {
+        $user = Auth::guard('client')->user();
+        if (!$user) {
             return redirect()->route('login.client')->with('error', 'Faça login para comprar.');
         }
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        // Inicia a query dos itens do carrinho
-        $query = CartItem::where('client_id', $userId)->with('product');
+        // Query itens do carrinho
+        $query = CartItem::where('client_id', $user->id)->with('product');
 
-        // LÓGICA DE SELEÇÃO: 
-        // Se o formulário enviou itens específicos (checkboxes), filtramos por eles.
-        // Caso contrário, pega tudo (comportamento padrão).
+        // Filtro de seleção (se houver)
         if ($request->has('selected_items') && is_array($request->selected_items)) {
-            // O frontend envia os IDs dos itens do carrinho (CartItem ID) ou Produtos.
-            // Assumindo que o value="{{ $id }}" no HTML seja o ID do produto ou do CartItem.
-            // Se for ID do produto: ->whereIn('product_id', ...)
-            // Se for ID do CartItem: ->whereIn('id', ...)
-            // Baseado no código anterior do livewire, geralmente é o ID do produto ($id da iteração).
-            
-            // Vamos filtrar pelo product_id para garantir
              $query->whereIn('product_id', $request->selected_items);
         }
 
         $dbItems = $query->get();
 
         if ($dbItems->isEmpty()) {
-            return back()->with('error', 'Nenhum item válido selecionado para compra.');
+            return back()->with('error', 'Nenhum item válido selecionado.');
         }
 
-        // Monta a lista para o Stripe
+        // Monta lista Stripe e guarda snapshot dos itens para o retorno
         $lineItems = [];
+        $itemsMeta = []; // Vamos salvar IDs e Qtd no metadata para garantir recuperação
+
         foreach ($dbItems as $item) {
-            // Proteção contra produtos excluídos ou sem preço
             if (!$item->product) continue;
 
             $lineItems[] = [
                 'price_data' => [
                     'currency' => 'brl',
-                    'product_data' => [
-                        'name' => $item->product->name,
-                        // Você pode adicionar imagens aqui se quiser:
-                        // 'images' => [$item->product->image_url], 
-                    ],
-                    'unit_amount' => intval($item->product->price * 100), // Stripe usa centavos (R$ 10,00 = 1000)
+                    'product_data' => ['name' => $item->product->name],
+                    'unit_amount' => intval($item->product->price * 100),
                 ],
                 'quantity' => $item->quantity,
             ];
+
+            // Guarda info mínima para reconstruir o pedido no retorno
+            $itemsMeta[] = $item->product_id . ':' . $item->quantity;
         }
 
-        // Cria a sessão no Stripe
         try {
             $session = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => $lineItems,
                 'mode' => 'payment',
-                
                 'success_url' => route('checkout.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('catalogo'), // Se cancelar, volta pra loja
+                'cancel_url' => route('catalogo'),
+                // METADADOS IMPORTANTES: Salvam o contexto mesmo se a sessão cair
+                'metadata' => [
+                    'client_id' => $user->id,
+                    'items_snapshot' => json_encode($itemsMeta) // Salva "1:2,5:1" (ProdID:Qtd)
+                ],
+                'customer_email' => $user->email, // Pré-preenche ementa no Stripe
             ]);
 
             return redirect($session->url);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Erro ao comunicar com Stripe: ' . $e->getMessage());
+            return back()->with('error', 'Erro Stripe: ' . $e->getMessage());
         }
     }
     
@@ -94,77 +88,85 @@ class CheckoutController extends Controller
         Stripe::setApiKey(env('STRIPE_SECRET'));
         $sessionId = $request->get('session_id');
 
-        if (!$sessionId) {
-            return redirect()->route('catalogo');
-        }
+        if (!$sessionId) return redirect()->route('catalogo');
 
         try {
             $session = Session::retrieve($sessionId);
 
-            // Verifica se já salvamos esse pedido antes (para evitar duplicidade no F5)
+            // Evita duplicidade
             if (Order::where('stripe_session_id', $sessionId)->exists()) {
-                return redirect()->route('home')->with('info', 'O seu pedido já foi processado.');
+                return redirect()->route('home')->with('info', 'Pedido já processado.');
             }
 
             if ($session->payment_status === 'paid') {
-                DB::beginTransaction(); // Protege o banco de dados
+                DB::beginTransaction();
 
-                // A. Cria o Pedido
-                // OBS: Certifique-se que seu Model Order tem 'casts' => ['shipping_address' => 'array']
-                // ou que a coluna no banco seja do tipo JSON/TEXT.
+                // RECUPERA O CLIENTE DOS METADADOS (Mais seguro que Auth::user())
+                $clientId = $session->metadata->client_id ?? Auth::guard('client')->id();
+                
+                // Cria o Pedido
                 $order = Order::create([
                     'stripe_session_id' => $sessionId,
-                    'client_id' => Auth::guard('client')->id(),
-                    'status' => 'paid', // ou 'concluido'
+                    'client_id' => $clientId, // Usa o ID recuperado
+                    'status' => 'paid',
                     'total_price' => $session->amount_total / 100,
-                    'customer_name' => $session->customer_details->name,
+                    'customer_name' => $session->customer_details->name ?? 'Cliente',
                     'customer_email' => $session->customer_details->email,
-                    // O Laravel converte array para JSON automaticamente se o Model estiver configurado,
-                    // senão use json_encode() aqui.
-                    
                 ]);
 
-                // B. Precisamos recuperar QUAIS itens foram comprados.
-                // Como o Stripe não devolve os IDs do nosso banco facilmente na session retrieve simples,
-                // vamos pegar o carrinho atual do usuário e assumir que ele pagou o que estava lá.
-                // (Para maior precisão, deveríamos ter salvo um 'pending order' antes, mas essa lógica funciona para fluxos simples)
+                // RECUPERA ITENS: Tenta pelo carrinho primeiro, fallback para metadata
+                // Isso garante que mesmo se o carrinho for limpo ou sessão perdida, temos os itens
+                $cartItems = CartItem::where('client_id', $clientId)->get();
                 
-                // NOTA: Se você implementou a seleção parcial, aqui temos um risco:
-                // Se o usuário selecionou 1 item, pagou, e voltou, o carrinho ainda tem todos os itens.
-                // O ideal é limpar apenas os itens comprados ou limpar tudo. 
-                // Vamos limpar tudo para simplificar conforme seu código original.
-                
-                $cartItems = CartItem::where('client_id', Auth::guard('client')->id())->get();
-
-                foreach ($cartItems as $item) {
-                    // Salva o item no pedido
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $item->product_id,
-                        'quantity' => $item->quantity,
-                        'price' => $item->product->price
-                    ]);
-
-                    // --- BAIXA O ESTOQUE ---
-                    $produto = Product::find($item->product_id);
-                    if ($produto) {
-                        $produto->decrement('stock_quantity', $item->quantity);
+                if ($cartItems->isNotEmpty()) {
+                    // Fluxo normal: Carrinho ainda existe
+                    foreach ($cartItems as $item) {
+                        OrderItem::create([
+                            'order_id' => $order->id,
+                            'product_id' => $item->product_id,
+                            'quantity' => $item->quantity,
+                            'price' => $item->product->price // Preço atual do banco
+                        ]);
+                        
+                        Product::find($item->product_id)?->decrement('stock_quantity', $item->quantity);
+                    }
+                    // Limpa carrinho
+                    CartItem::where('client_id', $clientId)->delete();
+                } 
+                else {
+                    // Fluxo de Segurança: Carrinho vazio? Usa os metadados do Stripe!
+                    // Formato salvo: ["1:2", "5:1"] (ProdID:Qtd)
+                    if (isset($session->metadata->items_snapshot)) {
+                        $itemsData = json_decode($session->metadata->items_snapshot);
+                        if (is_array($itemsData)) {
+                            foreach ($itemsData as $itemStr) {
+                                [$prodId, $qty] = explode(':', $itemStr);
+                                $prod = Product::find($prodId);
+                                if ($prod) {
+                                    OrderItem::create([
+                                        'order_id' => $order->id,
+                                        'product_id' => $prodId,
+                                        'quantity' => $qty,
+                                        'price' => $prod->price 
+                                    ]);
+                                    $prod->decrement('stock_quantity', $qty);
+                                }
+                            }
+                        }
                     }
                 }
 
-                // C. Limpa o carrinho
-            CartItem::where('client_id', Auth::guard('client')->id())->delete();
-
-                DB::commit(); // Salva tudo
-                
-                // Redireciona para a home com uma mensagem de sucesso
-                return redirect()->route('home')->with('success', 'Pagamento realizado com sucesso! Pedido #' . $order->id);
+                DB::commit();
+                return redirect()->route('home')->with('success', 'Pedido confirmado! #' . $order->id);
             }
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Erro no Checkout Success: " . $e->getMessage());
-            return redirect()->route('catalogo')->with('error', 'Erro ao processar pedido: ' . $e->getMessage());
+            Log::error("Erro Checkout: " . $e->getMessage());
+            // Se der erro, mostre na tela para debug (em produção, redirecione com flash)
+            return redirect()->route('catalogo')->with('error', 'Erro ao finalizar: ' . $e->getMessage());
         }
+        
+        return redirect()->route('catalogo');
     }
 }

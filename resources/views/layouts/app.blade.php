@@ -203,7 +203,8 @@
     
     {{-- COMPONENTE DO CARRINHO (BARRA LATERAL) --}}
     <livewire:cart-bar />
-    
+    @livewire('client-settings')
+    @livewire('meus-pedidos') 
     @livewireScripts
 
    <script>
