@@ -7,7 +7,7 @@
     <section class="position-relative w-100 min-vh-100 d-flex align-items-center overflow-hidden text-white hero-section pb-5">
         {{-- Background Mais Dinâmico --}}
         <div class="position-absolute top-0 start-0 w-100 h-100"
-             style="background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1517963879433-6ad2b056d712?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+             style="background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.2) 100%), url({{ asset('img/home.png') }});
                      background-size: cover; background-position: center top; background-attachment: fixed;">
         </div>
 

@@ -6,7 +6,7 @@
     <section class="position-relative overflow-hidden text-center text-white bg-dark py-5">
         {{-- Background com Overlay: Focado em produtos/potes e não em pesos de academia --}}
         <div class="position-absolute top-0 start-0 w-100 h-100"
-             style="background-image: url('https://images.unsplash.com/photo-1593095948071-474c5cc2989d?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center; filter: brightness(0.3);">
+             style="background-image: url({{ asset('img/creatina.png') }}); background-size: cover; background-position: center; filter: brightness(0.3);">
         </div>
 
         <div class="container position-relative z-1 py-5">
@@ -25,7 +25,7 @@
                 <div class="position-relative pe-lg-4">
                     <div class="ratio ratio-4x3 rounded-3 overflow-hidden shadow-lg border border-4 border-white">
                         {{-- Imagem de Estoque/Logística em vez de academia --}}
-                        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                        <img src="{{ asset('img/estoque.png') }}"
                              alt="Centro de Distribuição SuppStore"
                              class="object-fit-cover">
                     </div>
@@ -130,7 +130,7 @@
             {{-- Membro 1 --}}
             <div class="col-md-3 col-sm-6">
                 <div class="card border-0 text-center">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="CEO">
+                    <img src="{{ asset('img/roberto.png') }}" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="CEO">
                     <h5 class="fw-bold mb-0">Roberto Silva</h5>
                     <small class="text-warning fw-bold text-uppercase">Diretor Executivo</small>
                 </div>
@@ -138,7 +138,7 @@
             {{-- Membro 2 --}}
             <div class="col-md-3 col-sm-6">
                 <div class="card border-0 text-center">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="Nutricionista">
+                    <img src="{{ asset('img/amanda.png') }}" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="Nutricionista">
                     <h5 class="fw-bold mb-0">Dra. Amanda Costa</h5>
                     <small class="text-warning fw-bold text-uppercase">Resp. Técnica</small>
                 </div>
@@ -146,7 +146,7 @@
             {{-- Membro 3 --}}
             <div class="col-md-3 col-sm-6">
                 <div class="card border-0 text-center">
-                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="Logística">
+                    <img src="{{ asset('img/carlos.png') }}" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="Logística">
                     <h5 class="fw-bold mb-0">Carlos Mendes</h5>
                     <small class="text-warning fw-bold text-uppercase">Gerente de Estoque</small>
                 </div>
@@ -155,7 +155,7 @@
             <div class="col-md-3 col-sm-6">
                 <div class="card border-0 text-center">
                     {{-- Nova imagem para Júlia Pereira --}}
-                    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="Atendimento">
+                    <img src="{{ asset('img/julia.png') }}" class="card-img-top rounded-3 mb-3 shadow-sm object-fit-cover" style="height: 350px;" alt="Atendimento">
                     <h5 class="fw-bold mb-0">Júlia Pereira</h5>
                     <small class="text-warning fw-bold text-uppercase">Vendas Online</small>
                 </div>

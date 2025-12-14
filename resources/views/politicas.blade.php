@@ -127,8 +127,8 @@
             {{-- Rodapé de Ajuda / DPO --}}
             <div class="mt-5 text-center pt-4 border-top">
                 <p class="text-muted small mb-2">Para assuntos relacionados à privacidade e dados (DPO), entre em contato:</p>
-                <a href="mailto:privacidade@loja.com" class="text-decoration-none fw-bold text-dark fs-5">
-                    <i class="bi bi-envelope me-1"></i> privacidade@loja.com
+                <a href="mailto:privacidade@suppstore.com" class="text-decoration-none fw-bold text-dark fs-5">
+                    <i class="bi bi-envelope me-1"></i> suppstore@gmail.com
                 </a>
             </div>
 
